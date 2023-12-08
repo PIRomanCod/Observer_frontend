@@ -66,7 +66,6 @@ def login(username, password):
     :doc-author: Trelent
     """
     data = {"username": username, "password": password}
-    print(f"{SERVER_URL}/api/auth/login")
     response = requests.post(f"{SERVER_URL}/api/auth/login", data=data)
     if response.status_code == 200:
         return response.json()["access_token"], response.json()["refresh_token"]
