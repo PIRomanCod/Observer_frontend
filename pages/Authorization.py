@@ -250,7 +250,12 @@ class AuthManager:
     def refresh_token_in_background(self):
         # Оновлення токенів через /api/auth/refresh_token
         if self.refresh_token:
-            get_refresh_token(self.refresh_token)
+            new_access_token, new_refresh_token = get_refresh_token(self.refresh_token)
+            if new_access_token and new_refresh_token:
+                self.access_token, self.refresh_token = new_access_token, new_refresh_token
+                save_token(new_access_token, new_refresh_token)
+            else:
+                st.error("Token refresh failed.")
 
 
 if __name__ == '__main__':

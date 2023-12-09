@@ -117,19 +117,12 @@ def get_user_info(acc_token, ref_token):
 
 
 def get_refresh_token(ref_token):
-    """
-    The get_refresh_token function takes in a refresh token and returns an access token.
-        It does this by sending the refresh token to the server, which then sends back a new access_token and
-        refresh_token. The function returns both of these tokens.
-
-    :param ref_token: Get the access token and refresh token
-    :return: A tuple of the access token and refresh token
-    :doc-author: Trelent
-    """
     headers = {"Authorization": f"Bearer {ref_token}"}
     response = requests.get(f"{SERVER_URL}/api/auth/refresh_token", headers=headers)
-    if response.json().get("access_token"):
-        return response.json()["access_token"], response.json()["refresh_token"]
+    if response.status_code == 200:
+        new_access_token = response.json()["access_token"]
+        new_refresh_token = response.json()["refresh_token"]
+        return new_access_token, new_refresh_token
     return None, None
 
 
