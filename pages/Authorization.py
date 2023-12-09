@@ -255,9 +255,11 @@ class AuthManager:
                 self.access_token, self.refresh_token = new_access_token, new_refresh_token
                 save_token(new_access_token, new_refresh_token)
             else:
-                st.error("Token refresh failed.")
+                self.refresh_token_in_background()
+                st.error("WTFFF Token refresh failed.")
 
+
+auth_manager = AuthManager()
 
 if __name__ == '__main__':
-    auth_manager = AuthManager()
     auth_manager.run_app()
