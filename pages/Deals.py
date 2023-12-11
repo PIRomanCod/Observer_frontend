@@ -14,7 +14,7 @@ import hydralit_components as hc
 from pages.src.company_pages import get_company_by_id
 from pages.src.goods_pages import get_goods_by_id
 from pages.src.deals_pages import get_deal_by_id, get_deals_by_product, get_deals_by_company, get_deals_by_period
-from pages.src.auth_services import load_token, save_token, FILE_NAME
+from pages.src.auth_services import load_token, save_tokens, FILE_NAME
 from pages.src.user_footer import footer
 from pages.src.messages import deals_messages
 
@@ -105,7 +105,10 @@ def run_app():
             with hc.HyLoader('Now doing loading, wait please', hc.Loaders.pulse_bars):
                 time.sleep(1)
             result = get_company_by_id(access_token, company_id)
-            st.write(result)
+            if result.get("401"):
+                st.write("ReLogin")
+            else:
+                st.write(result)
 
     elif page == deals_messages[language]["Monthly report"]:
         with st.sidebar:
@@ -124,113 +127,116 @@ def run_app():
         if st.sidebar.button("GO"):
             with hc.HyLoader('Now doing loading, wait please', hc.Loaders.pulse_bars):
                 time.sleep(1)
-            result = get_deals_by_period(access_token, start_date, end_date)
-            if len(result["items"]) > 1:
-            # Побудова таблиці
-                df = pd.DataFrame(result["items"])
+            try:
+                result = get_deals_by_period(access_token, start_date, end_date)
+                if len(result["items"]) > 1:
+                # Побудова таблиці
+                    df = pd.DataFrame(result["items"])
 
-                # Вибір лише деяких стовбців та зміна порядку
-                selected_columns = ["date", "product_id", "company_id", "quantity", "sum_total_tl", "sum_total_usd",
-                                    "operation_type", "cost_per_mt_tl", "cost_per_mt_usd"]
-                df_selected = df[selected_columns]
+                    # Вибір лише деяких стовбців та зміна порядку
+                    selected_columns = ["date", "product_id", "company_id", "quantity", "sum_total_tl", "sum_total_usd",
+                                        "operation_type", "cost_per_mt_tl", "cost_per_mt_usd"]
+                    df_selected = df[selected_columns]
 
-                # Зміна порядку стовбців
-                df_selected = df_selected[
-                    ["date", "operation_type", "company_id", "product_id", "quantity", "sum_total_tl", "sum_total_usd",
-                     "cost_per_mt_tl", "cost_per_mt_usd"]]
+                    # Зміна порядку стовбців
+                    df_selected = df_selected[
+                        ["date", "operation_type", "company_id", "product_id", "quantity", "sum_total_tl", "sum_total_usd",
+                         "cost_per_mt_tl", "cost_per_mt_usd"]]
 
-                # Розділення даних за типом операції
-                df_income = df_selected[df_selected["operation_type"] == "income"]
-                df_outcome = df_selected[df_selected["operation_type"] == "outcome"]
+                    # Розділення даних за типом операції
+                    df_income = df_selected[df_selected["operation_type"] == "income"]
+                    df_outcome = df_selected[df_selected["operation_type"] == "outcome"]
 
-                df_income = df_income.drop("operation_type", axis=1)
-                df_outcome = df_outcome.drop("operation_type", axis=1)
+                    df_income = df_income.drop("operation_type", axis=1)
+                    df_outcome = df_outcome.drop("operation_type", axis=1)
 
-                # Отримання назв товарів та компаній
-                products_data = get_product_data("english_name", access_token)
-                products_dict = {product["id"]: product["name"] for product in products_data}
-                companies_data = {company["id"]: company["company_name"].capitalize() for company in
-                                  get_company_by_id(access_token, "")["items"]}
+                    # Отримання назв товарів та компаній
+                    products_data = get_product_data("english_name", access_token)
+                    products_dict = {product["id"]: product["name"] for product in products_data}
+                    companies_data = {company["id"]: company["company_name"].capitalize() for company in
+                                      get_company_by_id(access_token, "")["items"]}
 
-                # Заміна ідентифікаторів назвами в DataFrame
-                df_income["product_name"] = df_income["product_id"].map(products_dict)
-                df_income["company_name"] = df_income["company_id"].map(companies_data)
+                    # Заміна ідентифікаторів назвами в DataFrame
+                    df_income["product_name"] = df_income["product_id"].map(products_dict)
+                    df_income["company_name"] = df_income["company_id"].map(companies_data)
 
-                df_outcome["product_name"] = df_outcome["product_id"].map(products_dict)
-                df_outcome["company_name"] = df_outcome["company_id"].map(companies_data)
+                    df_outcome["product_name"] = df_outcome["product_id"].map(products_dict)
+                    df_outcome["company_name"] = df_outcome["company_id"].map(companies_data)
 
-                # Вибір лише деяких стовбців та зміна порядку
-                selected_columns_2 = ["date", "product_name", "company_name", "quantity", "sum_total_tl", "sum_total_usd",
-                                    "cost_per_mt_usd"]
-                df_income = df_income[selected_columns_2]
-                df_outcome = df_outcome[selected_columns_2]
+                    # Вибір лише деяких стовбців та зміна порядку
+                    selected_columns_2 = ["date", "product_name", "company_name", "quantity", "sum_total_tl", "sum_total_usd",
+                                        "cost_per_mt_usd"]
+                    df_income = df_income[selected_columns_2]
+                    df_outcome = df_outcome[selected_columns_2]
 
-                # Зміна порядку стовбців
-                df_income = df_income[["date", "company_name", "product_name", "quantity", "sum_total_tl", "sum_total_usd",
-                     "cost_per_mt_usd"]]
-                df_outcome = df_outcome[["date", "company_name", "product_name", "quantity", "sum_total_tl", "sum_total_usd",
-                     "cost_per_mt_usd"]]
+                    # Зміна порядку стовбців
+                    df_income = df_income[["date", "company_name", "product_name", "quantity", "sum_total_tl", "sum_total_usd",
+                         "cost_per_mt_usd"]]
+                    df_outcome = df_outcome[["date", "company_name", "product_name", "quantity", "sum_total_tl", "sum_total_usd",
+                         "cost_per_mt_usd"]]
 
-                # Додати новий стовбець для середньозваженої ціни
+                    # Додати новий стовбець для середньозваженої ціни
 
-                # Обчисліть загальну вартість та загальну вагу для кожного товару
-                total_cost_in = df_income.groupby('product_name')['sum_total_usd'].sum().reset_index()
-                total_weights_in = df_income.groupby('product_name')['quantity'].sum().reset_index()
-                # Злиття двох датафреймів по назві товару
-                merged_df_income = pd.merge(total_cost_in, total_weights_in, on='product_name', suffixes=('_cost', '_weight'))
-                # Додати новий стовпець для середньозваженої ціни
-                merged_df_income['avg_price, usd'] = merged_df_income['sum_total_usd'] / merged_df_income['quantity']
+                    # Обчисліть загальну вартість та загальну вагу для кожного товару
+                    total_cost_in = df_income.groupby('product_name')['sum_total_usd'].sum().reset_index()
+                    total_weights_in = df_income.groupby('product_name')['quantity'].sum().reset_index()
+                    # Злиття двох датафреймів по назві товару
+                    merged_df_income = pd.merge(total_cost_in, total_weights_in, on='product_name', suffixes=('_cost', '_weight'))
+                    # Додати новий стовпець для середньозваженої ціни
+                    merged_df_income['avg_price, usd'] = merged_df_income['sum_total_usd'] / merged_df_income['quantity']
 
-                # Обчисліть загальну вартість та загальну вагу для кожного товару
-                total_cost_out = df_outcome.groupby('product_name')['sum_total_usd'].sum().reset_index()
-                total_weights_out = df_outcome.groupby('product_name')['quantity'].sum().reset_index()
-                # Злиття двох датафреймів по назві товару
-                merged_df_outcome = pd.merge(total_cost_out, total_weights_out, on='product_name',
-                                             suffixes=('_cost', '_weight'))
-                # Додати новий стовпець для середньозваженої ціни
-                merged_df_outcome['avg_price, usd'] = merged_df_outcome['sum_total_usd'] / merged_df_outcome['quantity']
-
-
-                # Підготовка даних для графіка по витратам на товари
-                df_income_grouped = df_income.groupby(['date', 'product_name'])['sum_total_usd'].sum().reset_index()
-                df_outcome_grouped = df_outcome.groupby(['date', 'product_name'])['sum_total_usd'].sum().reset_index()
-
-                # Підготовка даних для графіка по компаніям
-                df_income_grouped_company = df_income.groupby(['date', 'company_name'])['sum_total_usd'].sum().reset_index()
-                df_outcome_grouped_company = df_outcome.groupby(['date', 'company_name'])['sum_total_usd'].sum().reset_index()
-
-                # Підготовка даних для графіка по вазі товарів
-                df_income_grouped_quantity = df_income.groupby(['date', 'product_name'])['quantity'].sum().reset_index()
-                df_outcome_grouped_quantity = df_outcome.groupby(['date', 'product_name'])['quantity'].sum().reset_index()
+                    # Обчисліть загальну вартість та загальну вагу для кожного товару
+                    total_cost_out = df_outcome.groupby('product_name')['sum_total_usd'].sum().reset_index()
+                    total_weights_out = df_outcome.groupby('product_name')['quantity'].sum().reset_index()
+                    # Злиття двох датафреймів по назві товару
+                    merged_df_outcome = pd.merge(total_cost_out, total_weights_out, on='product_name',
+                                                 suffixes=('_cost', '_weight'))
+                    # Додати новий стовпець для середньозваженої ціни
+                    merged_df_outcome['avg_price, usd'] = merged_df_outcome['sum_total_usd'] / merged_df_outcome['quantity']
 
 
-                st.title(deals_messages[language]["buy"])
-                # Побудова графіка в Plotly для df_income_grouped
-                fig_income = get_plots(language, df_income_grouped, df_income_grouped_company, df_income_grouped_quantity)
-                # Відображення графіка в Streamlit
-                st.plotly_chart(fig_income)
+                    # Підготовка даних для графіка по витратам на товари
+                    df_income_grouped = df_income.groupby(['date', 'product_name'])['sum_total_usd'].sum().reset_index()
+                    df_outcome_grouped = df_outcome.groupby(['date', 'product_name'])['sum_total_usd'].sum().reset_index()
 
-                st.write(deals_messages[language]["price"])
-                st.write(merged_df_income)
+                    # Підготовка даних для графіка по компаніям
+                    df_income_grouped_company = df_income.groupby(['date', 'company_name'])['sum_total_usd'].sum().reset_index()
+                    df_outcome_grouped_company = df_outcome.groupby(['date', 'company_name'])['sum_total_usd'].sum().reset_index()
 
-                st.write(deals_messages[language]["full"])
-                st.dataframe(df_income)
+                    # Підготовка даних для графіка по вазі товарів
+                    df_income_grouped_quantity = df_income.groupby(['date', 'product_name'])['quantity'].sum().reset_index()
+                    df_outcome_grouped_quantity = df_outcome.groupby(['date', 'product_name'])['quantity'].sum().reset_index()
 
-                st.title(deals_messages[language]["sell"])
-               # Побудова графіків в Plotly для df_income_grouped
-                fig_outcome = get_plots(language, df_outcome_grouped, df_outcome_grouped_company, df_outcome_grouped_quantity)
-                # Відображення графіка в Streamlit
-                st.plotly_chart(fig_outcome)
 
-                st.write(deals_messages[language]["price"])
-                st.write(merged_df_outcome)
+                    st.title(deals_messages[language]["buy"])
+                    # Побудова графіка в Plotly для df_income_grouped
+                    fig_income = get_plots(language, df_income_grouped, df_income_grouped_company, df_income_grouped_quantity)
+                    # Відображення графіка в Streamlit
+                    st.plotly_chart(fig_income)
 
-                st.write(deals_messages[language]["full"])
-                st.dataframe(df_outcome)
-            else:
-                st.write(deals_messages[language]["empty"])
+                    st.write(deals_messages[language]["price"])
+                    st.write(merged_df_income)
 
-    save_token(access_token, refresh_token)
+                    st.write(deals_messages[language]["full"])
+                    st.dataframe(df_income)
+
+                    st.title(deals_messages[language]["sell"])
+                   # Побудова графіків в Plotly для df_income_grouped
+                    fig_outcome = get_plots(language, df_outcome_grouped, df_outcome_grouped_company, df_outcome_grouped_quantity)
+                    # Відображення графіка в Streamlit
+                    st.plotly_chart(fig_outcome)
+
+                    st.write(deals_messages[language]["price"])
+                    st.write(merged_df_outcome)
+
+                    st.write(deals_messages[language]["full"])
+                    st.dataframe(df_outcome)
+                else:
+                    st.write(deals_messages[language]["empty"])
+            except TypeError:
+                st.write("ReLogin")
+
+    save_tokens(access_token, refresh_token)
 
 
 if __name__ == '__main__':

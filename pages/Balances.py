@@ -15,15 +15,13 @@ import streamlit as st
 import hydralit_components as hc
 
 from pages.src.company_pages import get_company_by_id
-from pages.src.goods_pages import get_goods_by_id
 from pages.src.balances_pages import get_transaction_by_id, get_transaction_by_company, get_transactions_by_period, \
     calculate_balance, get_turnovers, get_tables, get_plot_by_category, get_plot_by_companies, get_rate_by_date
-from pages.src.auth_services import load_token, save_token, FILE_NAME
+from pages.src.auth_services import load_token, save_tokens, FILE_NAME
 from pages.src.user_footer import footer
 from pages.src.messages import balance_messages
 
-from pages.src.get_stocks_data import get_product_data
-
+# from pages.Authorization import auth_manager
 
 st.set_page_config(page_title="Deals",
                    page_icon=":bar_chart:")
@@ -56,6 +54,10 @@ async def run_app():
     footer()
     access_token, refresh_token = None, None
     access_token, refresh_token = load_token(FILE_NAME)
+    # refresh_token = st.session_state["refresh_token"]
+    # access_token = st.session_state["access_token"]
+    # if access_token:
+    # st.write(refresh_token)
     language = menu_id
     st.sidebar.title(balance_messages[language]["title"])
     page = st.sidebar.selectbox(balance_messages[language]["Choose action"],
@@ -67,18 +69,20 @@ async def run_app():
                                 )
 
     if page == balance_messages[language]["Balance per company"]:
-        selected_company = st.selectbox(balance_messages[language]["choose"], get_company_by_id(access_token, "")["items"], key="Companies")
-        company_name = selected_company["company_name"]
-        company_id = selected_company["id"]
+        try:
+            selected_company = st.selectbox(balance_messages[language]["choose"], get_company_by_id(access_token, "")["items"], key="Companies")
+            company_name = selected_company["company_name"]
+            company_id = selected_company["id"]
 
-        if st.button("GO"):
-            with hc.HyLoader('Now doing loading, wait please', hc.Loaders.pulse_bars):
-                time.sleep(1)
-            result = await get_transaction_by_company(language, access_token, company_id)
-            balance_tl, balance_usd = await calculate_balance(result)
-            st.write(f"{balance_messages[language]['current balance']} {company_name.capitalize()} : {balance_tl} TL")
-            st.write(f"{balance_messages[language]['current balance']} {company_name.capitalize()} : {balance_usd} USD")
-
+            if st.button("GO"):
+                with hc.HyLoader('Now doing loading, wait please', hc.Loaders.pulse_bars):
+                    time.sleep(1)
+                result = await get_transaction_by_company(language, access_token, company_id)
+                balance_tl, balance_usd = await calculate_balance(result)
+                st.write(f"{balance_messages[language]['current balance']} {company_name.capitalize()} : {balance_tl} TL")
+                st.write(f"{balance_messages[language]['current balance']} {company_name.capitalize()} : {balance_usd} USD")
+        except KeyError:
+            st.write("ReLogin")
     elif page == balance_messages[language]["Balance per period"]:
         with st.sidebar:
             # Вибір місяця та року користувачем
@@ -99,50 +103,62 @@ async def run_app():
         if st.sidebar.button("GO"):
             with hc.HyLoader('Now doing loading, wait please', hc.Loaders.pulse_bars):
                 time.sleep(1)
-            companies = get_company_by_id(access_token, "")["items"]
-            exchange_rate = await get_rate_by_date(language, access_token, end_date)
-            if type(exchange_rate) == str:
-                st.write(balance_messages[language]["empty"])
+            response = get_company_by_id(access_token, "")
+            if response.get("items", 0):
+                companies = response["items"]
+                exchange_rate = await get_rate_by_date(language, access_token, end_date)
+                if type(exchange_rate) == str:
+                    st.write(balance_messages[language]["empty"])
+                else:
+                    exchange_rate = exchange_rate["usd_tl_rate"]
+
+                    # Замена company_id на имена компаний
+                    balances = await get_transactions_by_period(language, access_token, start_date, end_date)
+
+                    balance_by_category, balance_by_companies = await get_tables(exchange_rate, balances)
+
+                    balance_by_companies['company_name'] = balance_by_companies['company_id'].replace(
+                        {company['id']: company['company_name'] for company in companies}, inplace=True)
+
+                    # Удаление строк с balance_usd равным 0 или отсутствующим
+                    balance_by_companies = balance_by_companies.query('balance_usd != 0').dropna(subset=['balance_usd'])
+                    st.write(balance_messages[language]["exchange_rate"], exchange_rate)
+                    await get_plot_by_companies(language, balance_by_companies)
+                    await get_plot_by_category(language, balance_by_category)
             else:
-                exchange_rate = exchange_rate["usd_tl_rate"]
+                st.write("ReLogin")
 
-                # Замена company_id на имена компаний
-                balances = await get_transactions_by_period(language, access_token, start_date, end_date)
+    elif page == balance_messages[language]["Total balance"]:
+        end_date = pd.to_datetime(f"2023-11-30")
+        response = get_company_by_id(access_token, "")
+        if response.get("items", 0):
+            companies = response["items"]
+            exchange_rate = await get_rate_by_date(language, access_token, end_date)
+            exchange_rate = exchange_rate["usd_tl_rate"]
 
+            if st.button("GO"):
+                with hc.HyLoader('Now doing loading, wait please', hc.Loaders.pulse_bars):
+                    time.sleep(1)
+                balances = await get_turnovers(language, access_token)
                 balance_by_category, balance_by_companies = await get_tables(exchange_rate, balances)
 
+                # Замена company_id на имена компаний
                 balance_by_companies['company_name'] = balance_by_companies['company_id'].replace(
                     {company['id']: company['company_name'] for company in companies}, inplace=True)
 
                 # Удаление строк с balance_usd равным 0 или отсутствующим
                 balance_by_companies = balance_by_companies.query('balance_usd != 0').dropna(subset=['balance_usd'])
-                st.write(balance_messages[language]["exchange_rate"], exchange_rate)
+                st.write("exchange_rate", exchange_rate)
                 await get_plot_by_companies(language, balance_by_companies)
                 await get_plot_by_category(language, balance_by_category)
-
-    elif page == balance_messages[language]["Total balance"]:
-        end_date = pd.to_datetime(f"2023-11-30")
-        companies = get_company_by_id(access_token, "")["items"]
-        exchange_rate = await get_rate_by_date(language, access_token, end_date)
-        exchange_rate = exchange_rate["usd_tl_rate"]
-
-        if st.button("GO"):
-            with hc.HyLoader('Now doing loading, wait please', hc.Loaders.pulse_bars):
-                time.sleep(1)
-            balances = await get_turnovers(language, access_token)
-            balance_by_category, balance_by_companies = await get_tables(exchange_rate, balances)
-
-            # Замена company_id на имена компаний
-            balance_by_companies['company_name'] = balance_by_companies['company_id'].replace(
-                {company['id']: company['company_name'] for company in companies}, inplace=True)
-
-            # Удаление строк с balance_usd равным 0 или отсутствующим
-            balance_by_companies = balance_by_companies.query('balance_usd != 0').dropna(subset=['balance_usd'])
-            st.write("exchange_rate", exchange_rate)
-            await get_plot_by_companies(language, balance_by_companies)
-            await get_plot_by_category(language, balance_by_category)
-
-    save_token(access_token, refresh_token)
+        else:
+            st.write("ReLogin")
+    # else:
+    #     auth_manager.refresh_token_in_background()
+    #     access_token, refresh_token = auth_manager.get_tokens()
+    #     st.session_state["refresh_token"] = refresh_token
+    #     st.session_state["access_token"] = access_token
+    save_tokens(access_token, refresh_token)
 
 
 if __name__ == '__main__':

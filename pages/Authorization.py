@@ -160,30 +160,33 @@
 #     auth_manager = AuthManager()
 #     auth_manager.run_app()
 
-
 import streamlit as st
 import time
+import asyncio
 from pages.src.auth_pages import (
     login_page, signup_page, start_page,
     profile_page, reset_password_page,
     request_mail_page, change_avatar_page
 )
-from pages.src.auth_services import load_token, save_token, FILE_NAME, get_refresh_token
+from pages.src.auth_services import load_token, save_tokens, FILE_NAME, get_refresh_token
 from pages.src.user_footer import footer
 
 
 class AuthManager:
     def __init__(self):
-        self.access_token, self.refresh_token = load_token(FILE_NAME)
+        self.access_token, self.refresh_token = None, None #= load_token(FILE_NAME)
         # self.refresh_checkbox = st.empty()
 
     def login(self):
         if self.access_token:
-            # profile_page(self.access_token, self.refresh_token)
-            st.write("You are already in. Press Logout for LogIn")
+            profile_page(self.access_token)
+            if not profile_page:
+                self.refresh_token_in_background()
             self.access_token, self.refresh_token = load_token(FILE_NAME)
         else:
             self.access_token, self.refresh_token = login_page()
+            # st.write(self.access_token, self.refresh_token)
+            self.save_token()
 
     def signup(self):
         if self.access_token:
@@ -216,13 +219,13 @@ class AuthManager:
     def logout(self):
         if self.access_token:
             self.access_token, self.refresh_token = None, None
-            save_token(self.access_token, self.refresh_token)
+            save_tokens(self.access_token, self.refresh_token)
             st.rerun()
 
     def save_token(self):
-        save_token(self.access_token, self.refresh_token)
+        save_tokens(self.access_token, self.refresh_token)
 
-    def run_app(self):
+    async def run_app(self):
         footer()
         st.sidebar.title("Navigation")
         page = st.sidebar.selectbox(
@@ -231,8 +234,8 @@ class AuthManager:
                 "SignUp",
                 "Login",
                 # "My Profile",
-                # "Resending email signup confirmation",
-                # "Reset password via email",
+                "Resending email signup confirmation",
+                "Reset password via email",
                 # "Change avatar",
                 "Logout"
              ]
@@ -241,7 +244,7 @@ class AuthManager:
         if hasattr(self, page.lower()):
             getattr(self, page.lower())()
 
-        # # Оновлення токенів при виборі користувачем
+        # Оновлення токенів при виборі користувачем
         # if self.refresh_checkbox.checkbox("Automatically refresh tokens"):
         self.refresh_token_in_background()
 
@@ -249,17 +252,12 @@ class AuthManager:
 
     def refresh_token_in_background(self):
         # Оновлення токенів через /api/auth/refresh_token
+        self.access_token, self.refresh_token = load_token(FILE_NAME)
         if self.refresh_token:
-            new_access_token, new_refresh_token = get_refresh_token(self.refresh_token)
-            if new_access_token and new_refresh_token:
-                self.access_token, self.refresh_token = new_access_token, new_refresh_token
-                save_token(new_access_token, new_refresh_token)
-            else:
-                self.refresh_token_in_background()
-                st.error("WTFFF Token refresh failed.")
+            self.access_token, self.refresh_token = get_refresh_token(self.refresh_token)
+            save_tokens(self.access_token, self.refresh_token)
 
-
-auth_manager = AuthManager()
 
 if __name__ == '__main__':
-    auth_manager.run_app()
+    auth_manager = AuthManager()
+    asyncio.run(auth_manager.run_app())
