@@ -109,7 +109,7 @@ def start_page():
     st.title("Login for use all features")
 
 
-def profile_page(acc_token, ref_token):
+def profile_page(acc_token):
     """
     The profile_page function is used to display the user's profile information.
     It takes in two parameters: acc_token and ref_token, which are both strings.
@@ -122,13 +122,18 @@ def profile_page(acc_token, ref_token):
     :doc-author: Trelent
     """
     st.title("My profile")
-    user_info = get_user_info(acc_token, ref_token)
-    if user_info:
-        st.write(f"Username: {user_info['username']}")
-        st.write(f"Email: {user_info['email']}")
-        st.image(f"{user_info['avatar']}")
-    else:
-        st.error("Unable connect")
+    try:
+        user_info = get_user_info(acc_token)
+        if user_info:
+            st.write(f"Username: {user_info['username']}")
+            st.write(f"Email: {user_info['email']}")
+            st.image(f"{user_info['avatar']}")
+        else:
+            st.error("Unable connect")
+    except TypeError:
+        st.write("ReLogin")
+        return None
+
 
 
 def signup_page():
@@ -155,6 +160,3 @@ def signup_page():
         else:
             st.error("Password not match")
 
-
-def refresh(ref_token):
-    pass

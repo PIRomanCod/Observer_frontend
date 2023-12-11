@@ -7,14 +7,14 @@ import dotenv
 
 import requests
 
-# dotenv.load_dotenv()
+dotenv.load_dotenv()
 
 config = configparser.ConfigParser()
 config.read("config.ini")
 
 FILE_NAME = config.get("DEV", "token_name")
-SERVER_URL = config.get("DEV", "APP_URL")
-# SERVER_URL = os.getenv(SERVER_URL)
+# SERVER_URL = config.get("DEV", "APP_URL")
+SERVER_URL = os.getenv("APP_URL")
 
 
 def load_token(filename=FILE_NAME):
@@ -37,7 +37,7 @@ def load_token(filename=FILE_NAME):
             pickle.dump((None, None), fh)
 
 
-def save_token(acc_token, ref_token):
+def save_tokens(acc_token, ref_token):
     """
     The save_token function saves the access and refresh tokens to a file.
         The function takes two arguments: acc_token and ref_token.
@@ -92,7 +92,7 @@ def signup(username, email, password):
     return response.json()
 
 
-def get_user_info(acc_token, ref_token):
+def get_user_info(acc_token):
     """
     The get_user_info function takes in an access token and a refresh token,
     and returns the user's information. If the access token is expired, it will
@@ -107,22 +107,29 @@ def get_user_info(acc_token, ref_token):
     response = requests.get(f"{SERVER_URL}/api/users/me/", headers=headers)
     if response.status_code == 200:
         return response.json()
-    acc_token, ref_token = get_refresh_token(ref_token)
-    headers = {"Authorization": f"Bearer {acc_token}"}
-    response = requests.get(f"{SERVER_URL}/api/users/me/", headers=headers)
-    if response.status_code == 200:
-        save_token(acc_token, ref_token)
-        return response.json()
+    # acc_token, ref_token = get_refresh_token(ref_token)
+    # headers = {"Authorization": f"Bearer {acc_token}"}
+    # response = requests.get(f"{SERVER_URL}/api/users/me/", headers=headers)
+    # if response.status_code == 200:
+    #     save_token(acc_token, ref_token)
+    #     return response.json()
     return None, None
 
 
 def get_refresh_token(ref_token):
+    """
+    The get_refresh_token function takes in a refresh token and returns an access token.
+        It does this by sending the refresh token to the server, which then sends back a new access_token and
+        refresh_token. The function returns both of these tokens.
+
+    :param ref_token: Get the access token and refresh token
+    :return: A tuple of the access token and refresh token
+    :doc-author: Trelent
+    """
     headers = {"Authorization": f"Bearer {ref_token}"}
     response = requests.get(f"{SERVER_URL}/api/auth/refresh_token", headers=headers)
-    if response.status_code == 200:
-        new_access_token = response.json()["access_token"]
-        new_refresh_token = response.json()["refresh_token"]
-        return new_access_token, new_refresh_token
+    if response.json().get("access_token"):
+        return response.json()["access_token"], response.json()["refresh_token"]
     return None, None
 
 
