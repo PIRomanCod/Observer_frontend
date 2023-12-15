@@ -166,7 +166,7 @@ async def get_tables(exchange_rate, data):
             df["debit_turnover_tl"] / exchange_rate + df["debit_turnover_usd"]
     )
     df["credit_turnover_target_usd"] = (
-            df["credit_turnover_tl"] / exchange_rate  + df["credit_turnover_usd"]
+            df["credit_turnover_tl"] / exchange_rate + df["credit_turnover_usd"]
     )
 
     # Группировка по "expenses_category"
