@@ -275,7 +275,7 @@ from pages.src.user_footer import footer
 
 cookie_manager = stx.CookieManager()
 cookies = cookie_manager.get_all()
-st.write(cookies)
+# st.write(cookies)
 
 
 class AuthManager:
