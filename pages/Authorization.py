@@ -299,7 +299,7 @@ class AuthManager:
     #         await self.refresh_token_in_background()
 
     async def refresh(self):
-        await asyncio.sleep(60)
+        await asyncio.sleep(3500)
         print(f"UPSSS{datetime.now()}")
         new_access_token, new_refresh_token = get_refresh_token(cookie_manager.get("refresh_token"))
         if new_access_token and new_refresh_token:
