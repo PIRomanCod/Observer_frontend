@@ -281,7 +281,7 @@ st.write(cookies)
 class AuthManager:
     def __init__(self):
         self.access_token, self.refresh_token = None, None
-        self.session_id = cookie_manager.get("ajs_anonymous_id")
+        # self.session_id = cookie_manager.get("ajs_anonymous_id")
         # if not self.access_token:
         #     start_page()
     #     self.loop = asyncio.get_event_loop()
@@ -346,13 +346,13 @@ class AuthManager:
         if hasattr(self, page.lower()):
             getattr(self, page.lower())()
         asyncio.run(self.refresh())
-        st.write(self.access_token, self.refresh_token)
+        # st.write(self.access_token, self.refresh_token)
 
 
 def main():
     auth_manager = AuthManager()
     auth_manager.run_app()
-    st.write(auth_manager.access_token)
+    # st.write(auth_manager.access_token)
 
 
 if __name__ == '__main__':
