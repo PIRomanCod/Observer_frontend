@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 import time
+import extra_streamlit_components as stx
 
 import pandas as pd
 import calendar
@@ -21,7 +22,7 @@ from pages.src.auth_services import load_token, save_tokens, FILE_NAME
 from pages.src.user_footer import footer
 from pages.src.messages import balance_messages
 
-# from pages.Authorization import auth_manager
+
 
 st.set_page_config(page_title="Deals",
                    page_icon=":bar_chart:")
@@ -50,10 +51,19 @@ menu_id = hc.nav_bar(
     option_menu=True)
 
 
+cookie_manager = stx.CookieManager()
+cookies = cookie_manager.get_all()
+# st.write(cookies)
+
+
+
 async def run_app():
     footer()
     access_token, refresh_token = None, None
-    access_token, refresh_token = load_token(FILE_NAME)
+
+    access_token, refresh_token = cookies.get("access_token"), cookies.get("refresh_token")
+    # st.write(access_token)
+    # access_token, refresh_token = load_token(FILE_NAME)
     # refresh_token = st.session_state["refresh_token"]
     # access_token = st.session_state["access_token"]
     # if access_token:
@@ -158,7 +168,7 @@ async def run_app():
     #     access_token, refresh_token = auth_manager.get_tokens()
     #     st.session_state["refresh_token"] = refresh_token
     #     st.session_state["access_token"] = access_token
-    save_tokens(access_token, refresh_token)
+    # save_tokens(access_token, refresh_token)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 import pickle
 import time
 from datetime import date, timedelta
+import extra_streamlit_components as stx
 
 import hydralit_components as hc
 import pandas as pd
@@ -13,8 +14,12 @@ from pages.src.messages import stock_messages as messages, seeded_id, languages_
 from pages.src.general_services import get_query_params, get_db_data
 
 
+
 st.set_page_config(page_title="Stocks",
                    page_icon=":articulated_lorry:")
+
+cookie_manager = stx.CookieManager()
+cookies = cookie_manager.get_all()
 
 menu_data = [
     {'id': 'english_name', 'label': "english"},
@@ -150,9 +155,9 @@ def main(access_token, language):
 def run_app():
     footer()
     access_token = None
-    with open(FILE_NAME, "rb") as fh:
-        access_token, refresh_token = pickle.load(fh)
-
+    # with open(FILE_NAME, "rb") as fh:
+    #     access_token, refresh_token = pickle.load(fh)
+    access_token, refresh_token = cookies.get("access_token"), cookies.get("refresh_token")
     if access_token:
         language = menu_id
         st.write(messages[language]["about"])

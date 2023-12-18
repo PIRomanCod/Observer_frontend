@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
 import plotly.subplots as sp
+import extra_streamlit_components as stx
 
 import streamlit as st
 import hydralit_components as hc
@@ -24,6 +25,8 @@ from pages.src.get_stocks_data import get_product_data
 st.set_page_config(page_title="Deals",
                    page_icon=":bar_chart:")
 
+cookie_manager = stx.CookieManager()
+cookies = cookie_manager.get_all()
 
 menu_data = [
     {'id': 'english_name', 'label': "english"},
@@ -91,7 +94,8 @@ def get_plots(language, df_income_grouped, df_income_grouped_company, df_income_
 def run_app():
     footer()
     access_token = None
-    access_token, refresh_token = load_token(FILE_NAME)
+    # access_token, refresh_token = load_token(FILE_NAME)
+    access_token, refresh_token = cookies.get("access_token"), cookies.get("refresh_token")
     language = menu_id
     st.sidebar.title(deals_messages[language]["title"])
     page = st.sidebar.selectbox(deals_messages[language]["Choose action"],
@@ -236,7 +240,7 @@ def run_app():
             except TypeError:
                 st.write("ReLogin")
 
-    save_tokens(access_token, refresh_token)
+    # save_tokens(access_token, refresh_token)
 
 
 if __name__ == '__main__':

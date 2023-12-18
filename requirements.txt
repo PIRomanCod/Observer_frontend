@@ -13,4 +13,5 @@ seaborn==0.13.0
 htbuilder==0.6.2
 hydralit-components==1.0.10
 plotly==5.18.0
+streamlit-authenticator
 
