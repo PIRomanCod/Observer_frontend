@@ -93,8 +93,6 @@ def main():
         asyncio.run(run_balances_app())
     elif menu_id == 'stocks':
         run_stocks_app()
-    elif menu_id == 'login_name':
-        st.write("Chose another point")
 
 
 if __name__ == '__main__':
