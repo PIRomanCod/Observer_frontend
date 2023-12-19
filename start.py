@@ -7,6 +7,7 @@ from htmlTemplates import css
 from api_pages.src.user_footer import footer
 from api_pages.src.backgroung import back
 from api_pages.src.messages import hello_messages
+from api_pages.src.auth_pages import profile_page
 from api_pages.Deals import run_deals_app
 from api_pages.Authorization import main_auth
 from api_pages.Balances import run_balances_app
@@ -93,6 +94,8 @@ def main():
         run_deals_app()
     elif menu_id == 'balances':
         asyncio.run(run_balances_app())
+    elif menu_id == 'login_name':
+        profile_page(st.session_state.get("access_token", ""))
 
 
 if __name__ == '__main__':
