@@ -380,7 +380,7 @@ async def main_auth():
     # st.write(auth_manager.access_token)
 
 
-    st.write(st.session_state)
+st.write(st.session_state)
 
 if __name__ == '__main__':
     # main()
