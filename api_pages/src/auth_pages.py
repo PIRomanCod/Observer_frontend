@@ -163,9 +163,14 @@
 #####################################################################################3
 
 import streamlit as st
-from pages.src.auth_services import login, signup, get_user_info, set_new_pass, set_avatar, reset_password, request_email
+import extra_streamlit_components as stx
+
+from api_pages.src.auth_services import login, signup, get_user_info, set_new_pass, set_avatar, reset_password, request_email
 
 IMG_TYPE = ['png', 'jpg', 'jpeg', 'gif', 'svg']
+
+cookie_manager = stx.CookieManager()
+cookies = cookie_manager.get_all()
 
 
 def login_page():
@@ -197,12 +202,14 @@ async def change_avatar_page(acc_token, ref_token):
                 else:
                     st.error(f"Error: {res}")
 
+
 async def request_mail_page():
     st.title("Resending email signup confirmation")
     email_reset = st.text_input("Email request")
     if st.button("Request email"):
         await request_email(email_reset)
         st.success(f"Success.  Check email: {email_reset} and verify")
+
 
 async def reset_password_page():
     st.title("Reset password via email")
@@ -222,6 +229,7 @@ async def reset_password_page():
                 st.error(f"Something wrong.")
         else:
             st.error("Password not match")
+
 
 def signup_page():
     """
@@ -259,13 +267,14 @@ def profile_page(acc_token):
     :return: The user information
     :doc-author: Trelent
     """
-    st.title("My profile")
+    st.write("My profile")
     try:
         user_info = get_user_info(acc_token)
         if user_info:
             st.write(f"Username: {user_info['username']}")
             st.write(f"Email: {user_info['email']}")
             st.image(f"{user_info['avatar']}")
+            st.session_state["username"] = user_info['username']
         else:
             st.error("Unable connect")
     except TypeError:

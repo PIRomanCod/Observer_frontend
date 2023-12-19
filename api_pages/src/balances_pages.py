@@ -16,9 +16,9 @@ config = configparser.ConfigParser()
 config.read("config.ini")
 
 FILE_NAME = config.get("DEV", "token_name")
-from pages.src.auth_services import SERVER_URL
-from pages.src.company_pages import get_company_by_id
-from pages.src.messages import balance_messages
+from api_pages.src.auth_services import SERVER_URL
+from api_pages.src.company_pages import get_company_by_id
+from api_pages.src.messages import balance_messages
 
 
 def get_transaction_by_id(language, acc_token, id):

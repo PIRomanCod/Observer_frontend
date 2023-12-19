@@ -215,6 +215,7 @@ config.read("config.ini")
 FILE_NAME = config.get("DEV", "token_name")
 SERVER_URL = os.getenv("APP_URL")
 
+
 def load_token(filename=FILE_NAME):
     try:
         with open(FILE_NAME, "rb") as fh:
@@ -223,6 +224,7 @@ def load_token(filename=FILE_NAME):
     except IOError:
         with open(FILE_NAME, "wb") as fh:
             pickle.dump((None, None), fh)
+
 
 def save_tokens(acc_token, ref_token):
     with open(FILE_NAME, "wb") as fh:
@@ -240,18 +242,19 @@ def login(username, password):
         return None
 
 
-async def signup(username, email, password):
+def signup(username, email, password):
     data = {"username": username, "email": email, "password": password}
     response = requests.post(f"{SERVER_URL}/api/auth/signup", data=json.dumps(data))
     return response.json()
 
 
-async def get_user_info(acc_token):
+def get_user_info(acc_token):
     headers = {"Authorization": f"Bearer {acc_token}"}
     response = requests.get(f"{SERVER_URL}/api/users/me/", headers=headers)
     if response.status_code == 200:
         return response.json()
     return None, None
+
 
 def get_refresh_token(ref_token):
     headers = {"Authorization": f"Bearer {ref_token}"}
@@ -261,29 +264,32 @@ def get_refresh_token(ref_token):
     return None, None
 
 
-async def set_new_pass(pass_token, password, password_confirm):
+def set_new_pass(pass_token, password, password_confirm):
     data = {"reset_password_token": pass_token, "new_password": password, "confirm_password": password_confirm}
     response = requests.post(f"{SERVER_URL}/api/auth/set_new_password", data=json.dumps(data))
     if response.status_code == 200:
         return response
     return response
 
-async def request_email(email_):
+
+def request_email(email_):
     data = {"email": email_}
-    response = await requests.post(f"{SERVER_URL}/api/auth/request_email", data=json.dumps(data))
+    response = requests.post(f"{SERVER_URL}/api/auth/request_email", data=json.dumps(data))
     print(response.json())
     return response.json()
 
-async def reset_password(email):
+
+def reset_password(email):
     data = {"email": email}
-    response = await requests.post(f"{SERVER_URL}/api/auth/reset_password", data=json.dumps(data))
+    response = requests.post(f"{SERVER_URL}/api/auth/reset_password", data=json.dumps(data))
     print(response.json())
     return response.json()
 
-async def set_avatar(acc_token, data):
+
+def set_avatar(acc_token, data):
     headers = {"Authorization": f"Bearer {acc_token}"}
     files = {'file': data}
-    response = await requests.patch(f"{SERVER_URL}/api/users/avatar", files=files, headers=headers)
+    response = requests.patch(f"{SERVER_URL}/api/users/avatar", files=files, headers=headers)
     return response.json()
 
 

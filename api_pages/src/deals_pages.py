@@ -14,9 +14,9 @@ config = configparser.ConfigParser()
 config.read("config.ini")
 
 FILE_NAME = config.get("DEV", "token_name")
-from pages.src.auth_services import SERVER_URL
-from pages.src.get_stocks_data import get_product_data
-from pages.src.company_pages import get_company_by_id
+from api_pages.src.auth_services import SERVER_URL
+from api_pages.src.get_stocks_data import get_product_data
+from api_pages.src.company_pages import get_company_by_id
 
 
 def get_deal_by_id(acc_token, id):
