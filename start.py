@@ -89,9 +89,9 @@ def main():
     elif menu_id == 'auth':
         asyncio.run(main_auth())
     elif menu_id == 'stocks':
-        run_stocks_app()
+        asyncio.run(run_stocks_app())
     elif menu_id == 'deals':
-        run_deals_app()
+        asyncio.run(run_deals_app())
     elif menu_id == 'balances':
         asyncio.run(run_balances_app())
     elif menu_id == 'login_name':

@@ -2,6 +2,7 @@ import pickle
 import time
 from datetime import date, timedelta
 # import extra_streamlit_components as stx
+import asyncio
 
 import hydralit_components as hc
 import pandas as pd
@@ -46,7 +47,7 @@ from api_pages.src.general_services import get_query_params, get_db_data
 #     option_menu=True)
 
 
-def main(access_token, language):
+async def main(access_token, language):
     try:
         with st.sidebar:
 
@@ -154,7 +155,7 @@ def main(access_token, language):
     except TypeError:
         st.write("ReLogin")
 
-def run_stocks_app():
+async def run_stocks_app():
     footer()
     access_token = None
     # with open(FILE_NAME, "rb") as fh:
@@ -167,10 +168,10 @@ def run_stocks_app():
 
         st.write(messages[language]["about"])
         st.text(messages[language]["instruction"])
-        main(access_token, language)
+        await main(access_token, language)
     else:
         st.write("Please LogIn to continue")
 
 
 if __name__ == '__main__':
-    run_stocks_app()
+    asyncio.run(run_stocks_app())
