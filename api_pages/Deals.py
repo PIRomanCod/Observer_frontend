@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 import time
+import asyncio
 
 import pandas as pd
 import calendar
@@ -52,7 +53,7 @@ st.set_page_config(page_title="Deals",
 #     option_menu=True)
 #
 
-def get_plots(language, df_income_grouped, df_income_grouped_company, df_income_grouped_quantity):
+async def get_plots(language, df_income_grouped, df_income_grouped_company, df_income_grouped_quantity):
     fig_income = sp.make_subplots(rows=1, cols=3, specs=[[{"type": "pie"}, {"type": "pie"}, {"type": "pie"}]],
                                   subplot_titles=deals_messages[language]["subplot_titles"])
     # By Product
@@ -92,7 +93,7 @@ def get_plots(language, df_income_grouped, df_income_grouped_company, df_income_
     return fig_income
 
 
-def run_deals_app():
+async def run_deals_app():
     footer()
     access_token = None
     # access_token, refresh_token = load_token(FILE_NAME)
@@ -219,7 +220,7 @@ def run_deals_app():
 
                     st.title(deals_messages[language]["buy"])
                     # Побудова графіка в Plotly для df_income_grouped
-                    fig_income = get_plots(language, df_income_grouped, df_income_grouped_company, df_income_grouped_quantity)
+                    fig_income = await get_plots(language, df_income_grouped, df_income_grouped_company, df_income_grouped_quantity)
                     # Відображення графіка в Streamlit
                     st.plotly_chart(fig_income)
 
@@ -231,7 +232,7 @@ def run_deals_app():
 
                     st.title(deals_messages[language]["sell"])
                    # Побудова графіків в Plotly для df_income_grouped
-                    fig_outcome = get_plots(language, df_outcome_grouped, df_outcome_grouped_company, df_outcome_grouped_quantity)
+                    fig_outcome = await get_plots(language, df_outcome_grouped, df_outcome_grouped_company, df_outcome_grouped_quantity)
                     # Відображення графіка в Streamlit
                     st.plotly_chart(fig_outcome)
 
@@ -249,6 +250,6 @@ def run_deals_app():
 
 
 if __name__ == '__main__':
-    run_deals_app()
+    asyncio.run(run_deals_app())
 
 

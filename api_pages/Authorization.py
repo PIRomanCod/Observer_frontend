@@ -331,7 +331,7 @@ class AuthManager:
                 self.access_token, self.refresh_token = acc_token, ref_token
                 st.session_state["access_token"] = acc_token
                 st.session_state["refresh_token"] = ref_token
-                st.write(self.access_token)
+                # st.write(self.access_token)
                 try:
                     await profile_page(self.access_token)
                 except TypeError:
