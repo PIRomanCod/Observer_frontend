@@ -39,9 +39,9 @@ st.write(css, unsafe_allow_html=True)
 menu_data = [
     {'id': 'home', 'label': "Home"},
     {'id': 'auth', 'label': "LogIn"},
+    {'id': 'stocks', 'label': "Stocks"},
     {'id': 'deals', 'label': "Deals"},
     {'id': 'balances', 'label': "Balances"},
-    {'id': 'stocks', 'label': "Stocks"},
 ]
 
 menu_id = hc.nav_bar(
@@ -87,12 +87,12 @@ def main():
         st.text(hello_messages[language]["instruction"])
     elif menu_id == 'auth':
         asyncio.run(main_auth())
+    elif menu_id == 'stocks':
+        run_stocks_app()
     elif menu_id == 'deals':
         run_deals_app()
     elif menu_id == 'balances':
         asyncio.run(run_balances_app())
-    elif menu_id == 'stocks':
-        run_stocks_app()
 
 
 if __name__ == '__main__':
