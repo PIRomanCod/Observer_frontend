@@ -12,44 +12,45 @@ import extra_streamlit_components as stx
 import streamlit as st
 import hydralit_components as hc
 
-from pages.src.company_pages import get_company_by_id
-from pages.src.goods_pages import get_goods_by_id
-from pages.src.deals_pages import get_deal_by_id, get_deals_by_product, get_deals_by_company, get_deals_by_period
-from pages.src.auth_services import load_token, save_tokens, FILE_NAME
-from pages.src.user_footer import footer
-from pages.src.messages import deals_messages
+from api_pages.src.company_pages import get_company_by_id
+from api_pages.src.goods_pages import get_goods_by_id
+from api_pages.src.deals_pages import get_deal_by_id, get_deals_by_product, get_deals_by_company, get_deals_by_period
+from api_pages.src.auth_services import load_token, save_tokens, FILE_NAME
+from api_pages.src.user_footer import footer
+from api_pages.src.messages import deals_messages
 
-from pages.src.get_stocks_data import get_product_data
+from api_pages.src.get_stocks_data import get_product_data
 
 
 st.set_page_config(page_title="Deals",
                    page_icon=":bar_chart:")
 
-cookie_manager = stx.CookieManager()
-cookies = cookie_manager.get_all()
+# cookie_manager = stx.CookieManager()
+# cookies = cookie_manager.get_all()
 
-menu_data = [
-    {'id': 'english_name', 'label': "english"},
-    {'id': 'ukrainian_name', 'label': "українська"},
-    {'id': 'russian_name', 'label': "русский"},
-    {'id': 'turkish_name', 'label': "türkçe"},
-]
-
-menu_id = hc.nav_bar(
-    menu_definition=menu_data,
-    first_select=0,
-    key=None,
-    home_name=None,
-    login_name=None,
-    override_theme={'txc_inactive': 'white', 'menu_background': 'green', 'txc_active': 'yellow',
-                    'option_active': 'blue'},
-    sticky_nav=True,
-    force_value=None,
-    use_animation=True,
-    hide_streamlit_markers=True,
-    sticky_mode=None,
-    option_menu=True)
-
+# menu_data = [
+#     {'id': 'english_name', 'label': "english"},
+#     {'id': 'ukrainian_name', 'label': "українська"},
+#     {'id': 'russian_name', 'label': "русский"},
+#     {'id': 'turkish_name', 'label': "türkçe"},
+# ]
+#
+#
+# menu_id = hc.nav_bar(
+#     menu_definition=menu_data,
+#     first_select=0,
+#     key="stock_nav",
+#     home_name=None,
+#     login_name={'id': "login_name", 'label': st.session_state.get("username", None), 'icon': "fa fa-user-circle", 'ttip': "username"},
+#     override_theme={'txc_inactive': 'white', 'menu_background': 'green', 'txc_active': 'yellow',
+#                     'option_active': 'blue'},
+#     sticky_nav=True,
+#     force_value=None,
+#     use_animation=True,
+#     hide_streamlit_markers=True,
+#     sticky_mode=None,
+#     option_menu=True)
+#
 
 def get_plots(language, df_income_grouped, df_income_grouped_company, df_income_grouped_quantity):
     fig_income = sp.make_subplots(rows=1, cols=3, specs=[[{"type": "pie"}, {"type": "pie"}, {"type": "pie"}]],
@@ -91,12 +92,16 @@ def get_plots(language, df_income_grouped, df_income_grouped_company, df_income_
     return fig_income
 
 
-def run_app():
+def run_deals_app():
     footer()
     access_token = None
     # access_token, refresh_token = load_token(FILE_NAME)
-    access_token, refresh_token = cookies.get("access_token"), cookies.get("refresh_token")
-    language = menu_id
+    # access_token, refresh_token = cookies.get("access_token"), cookies.get("refresh_token")
+    # refresh_token = st.session_state.get("refresh_token", "")
+    access_token = st.session_state.get("access_token", "")
+    # language = menu_id
+    language = st.session_state.get("selected_language", "english_name")
+
     st.sidebar.title(deals_messages[language]["title"])
     page = st.sidebar.selectbox(deals_messages[language]["Choose action"],
                                 [deals_messages[language]["Monthly report"],
@@ -244,6 +249,6 @@ def run_app():
 
 
 if __name__ == '__main__':
-    run_app()
+    run_deals_app()
 
 

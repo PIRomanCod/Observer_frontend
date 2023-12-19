@@ -6,7 +6,7 @@ import requests
 from dotenv import load_dotenv
 
 from src.config.config import settings
-from pages.src.auth_services import SERVER_URL
+from api_pages.src.auth_services import SERVER_URL
 
 
 def post_stocks_data(params, acc_token):

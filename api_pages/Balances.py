@@ -15,12 +15,12 @@ import asyncio
 import streamlit as st
 import hydralit_components as hc
 
-from pages.src.company_pages import get_company_by_id
-from pages.src.balances_pages import get_transaction_by_id, get_transaction_by_company, get_transactions_by_period, \
+from api_pages.src.company_pages import get_company_by_id
+from api_pages.src.balances_pages import get_transaction_by_id, get_transaction_by_company, get_transactions_by_period, \
     calculate_balance, get_turnovers, get_tables, get_plot_by_category, get_plot_by_companies, get_rate_by_date
-from pages.src.auth_services import load_token, save_tokens, FILE_NAME
-from pages.src.user_footer import footer
-from pages.src.messages import balance_messages
+# from pages.src.auth_services import load_token, save_tokens, FILE_NAME
+from api_pages.src.user_footer import footer
+from api_pages.src.messages import balance_messages
 
 
 
@@ -28,52 +28,52 @@ st.set_page_config(page_title="Deals",
                    page_icon=":bar_chart:")
 
 
-menu_data = [
-    {'id': 'english_name', 'label': "english"},
-    {'id': 'ukrainian_name', 'label': "українська"},
-    {'id': 'russian_name', 'label': "русский"},
-    {'id': 'turkish_name', 'label': "türkçe"},
-]
+# cookie_manager = stx.CookieManager()
+# cookies = cookie_manager.get_all()
 
-menu_id = hc.nav_bar(
-    menu_definition=menu_data,
-    first_select=0,
-    key=None,
-    home_name=None,
-    login_name=None,
-    override_theme={'txc_inactive': 'white', 'menu_background': 'green', 'txc_active': 'yellow',
-                    'option_active': 'blue'},
-    sticky_nav=True,
-    force_value=None,
-    use_animation=True,
-    hide_streamlit_markers=True,
-    sticky_mode=None,
-    option_menu=True)
-
-
-cookie_manager = stx.CookieManager()
-cookies = cookie_manager.get_all()
-# st.write(cookies)
-
+#
+# menu_data = [
+#     {'id': 'english_name', 'label': "english"},
+#     {'id': 'ukrainian_name', 'label': "українська"},
+#     {'id': 'russian_name', 'label': "русский"},
+#     {'id': 'turkish_name', 'label': "türkçe"},
+# ]
+#
+# menu_id = hc.nav_bar(
+#     menu_definition=menu_data,
+#     first_select=0,
+#     key="stock_nav",
+#     home_name=None,
+#     login_name={'id': "login_name", 'label': st.session_state.get("username", None), 'icon': "fa fa-user-circle", 'ttip': "username"},
+#     override_theme={'txc_inactive': 'white', 'menu_background': 'green', 'txc_active': 'yellow',
+#                     'option_active': 'blue'},
+#     sticky_nav=True,
+#     force_value=None,
+#     use_animation=True,
+#     hide_streamlit_markers=True,
+#     sticky_mode=None,
+#     option_menu=True)
 
 
-async def run_app():
+async def run_balances_app():
     footer()
     access_token, refresh_token = None, None
 
-    access_token, refresh_token = cookies.get("access_token"), cookies.get("refresh_token")
+    # access_token, refresh_token = cookies.get("access_token"), cookies.get("refresh_token")
     # st.write(access_token)
     # access_token, refresh_token = load_token(FILE_NAME)
     # refresh_token = st.session_state["refresh_token"]
-    # access_token = st.session_state["access_token"]
+    access_token = st.session_state.get("access_token", "")
     # if access_token:
     # st.write(refresh_token)
-    language = menu_id
+    # language = menu_id
+    language = st.session_state.get("selected_language", "english_name")
+
     st.sidebar.title(balance_messages[language]["title"])
     page = st.sidebar.selectbox(balance_messages[language]["Choose action"],
-                                [balance_messages[language]["Balance per company"],
+                                [balance_messages[language]["Balance per period"],
+                                 balance_messages[language]["Balance per company"],
                                 balance_messages[language]["Total balance"],
-                                balance_messages[language]["Balance per period"],
 
                                  ]
                                 )
@@ -173,4 +173,4 @@ async def run_app():
 
 if __name__ == '__main__':
     # run_app()
-    asyncio.run(run_app())
+    asyncio.run(run_balances_app())

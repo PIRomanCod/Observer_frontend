@@ -1,47 +1,49 @@
 import pickle
 import time
 from datetime import date, timedelta
-import extra_streamlit_components as stx
+# import extra_streamlit_components as stx
 
 import hydralit_components as hc
 import pandas as pd
 import plotly.express as px
 import streamlit as st
-from pages.src.auth_services import FILE_NAME
-from pages.src.get_stocks_data import post_stocks_data, get_product_data
-from pages.src.user_footer import footer
-from pages.src.messages import stock_messages as messages, seeded_id, languages_id
-from pages.src.general_services import get_query_params, get_db_data
+# from pages.src.auth_services import FILE_NAME
+from api_pages.src.get_stocks_data import post_stocks_data, get_product_data
+from api_pages.src.user_footer import footer
+from api_pages.src.messages import stock_messages as messages, seeded_id, languages_id
+from api_pages.src.general_services import get_query_params, get_db_data
+
+#
+# st.set_page_config(page_title="Stocks",
+#                    page_icon=":articulated_lorry:")
+
+#
+# cookie_manager = stx.CookieManager()
+# cookies = cookie_manager.get_all()
 
 
-
-st.set_page_config(page_title="Stocks",
-                   page_icon=":articulated_lorry:")
-
-cookie_manager = stx.CookieManager()
-cookies = cookie_manager.get_all()
-
-menu_data = [
-    {'id': 'english_name', 'label': "english"},
-    {'id': 'ukrainian_name', 'label': "українська"},
-    {'id': 'russian_name', 'label': "русский"},
-    {'id': 'turkish_name', 'label': "türkçe"},
-]
-
-menu_id = hc.nav_bar(
-    menu_definition=menu_data,
-    first_select=0,
-    key=None,
-    home_name=None,
-    login_name=None,
-    override_theme={'txc_inactive': 'white', 'menu_background': 'green', 'txc_active': 'yellow',
-                    'option_active': 'blue'},
-    sticky_nav=True,
-    force_value=None,
-    use_animation=True,
-    hide_streamlit_markers=True,
-    sticky_mode=None,
-    option_menu=True)
+#
+# menu_data = [
+#     {'id': 'english_name', 'label': "english", 'icon': ":flag-gb:"},
+#     {'id': 'ukrainian_name', 'label': "українська"},
+#     {'id': 'russian_name', 'label': "русский"},
+#     {'id': 'turkish_name', 'label': "türkçe", 'icon': ":flag-tr:"},
+# ]
+#
+# menu_id = hc.nav_bar(
+#     menu_definition=menu_data,
+#     first_select=0,
+#     key="stock_nav",
+#     home_name=None,
+#     login_name={'id': "login_name", 'label': st.session_state.get("username", None), 'icon': "fa fa-user-circle", 'ttip': "username"},
+#     override_theme={'txc_inactive': 'white', 'menu_background': 'green', 'txc_active': 'yellow',
+#                     'option_active': 'blue'},
+#     sticky_nav=True,
+#     force_value=None,
+#     use_animation=True,
+#     hide_streamlit_markers=True,
+#     sticky_mode=None,
+#     option_menu=True)
 
 
 def main(access_token, language):
@@ -152,14 +154,17 @@ def main(access_token, language):
     except TypeError:
         st.write("ReLogin")
 
-def run_app():
+def run_stocks_app():
     footer()
     access_token = None
     # with open(FILE_NAME, "rb") as fh:
     #     access_token, refresh_token = pickle.load(fh)
-    access_token, refresh_token = cookies.get("access_token"), cookies.get("refresh_token")
+    # access_token, refresh_token = cookies.get("access_token"), cookies.get("refresh_token")
+    access_token = st.session_state.get("access_token", "")
     if access_token:
-        language = menu_id
+        # language = menu_id
+        language = st.session_state.get("selected_language", "english_name")
+
         st.write(messages[language]["about"])
         st.text(messages[language]["instruction"])
         main(access_token, language)
@@ -168,4 +173,4 @@ def run_app():
 
 
 if __name__ == '__main__':
-    run_app()
+    run_stocks_app()
