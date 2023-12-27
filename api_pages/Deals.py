@@ -23,8 +23,8 @@ from api_pages.src.messages import deals_messages
 from api_pages.src.get_stocks_data import get_product_data
 
 
-st.set_page_config(page_title="Deals",
-                   page_icon=":bar_chart:")
+# st.set_page_config(page_title="Deals",
+#                    page_icon=":bar_chart:")
 
 # cookie_manager = stx.CookieManager()
 # cookies = cookie_manager.get_all()

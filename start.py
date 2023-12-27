@@ -12,6 +12,8 @@ from api_pages.Deals import run_deals_app
 from api_pages.Authorization import main_auth
 from api_pages.Balances import run_balances_app
 from api_pages.Stocks_viewer import run_stocks_app
+from api_pages.Production import run_production_app
+
 
 # st.set_page_config(page_title="Company observer",
 #                    page_icon="chart_with_upwards_trend")
@@ -41,8 +43,10 @@ menu_data = [
     {'id': 'home', 'label': "Home"},
     {'id': 'auth', 'label': "LogIn"},
     {'id': 'stocks', 'label': "Stocks"},
+    {'id': 'production', 'label': "Production"},
     {'id': 'deals', 'label': "Deals"},
     {'id': 'balances', 'label': "Balances"},
+
 ]
 
 menu_id = hc.nav_bar(
@@ -84,12 +88,15 @@ def main():
             # Виведення обраного значення
             st.write("Selected Language:", selected_language)
             language = st.session_state.get("selected_language", "english_name")
+
         st.title(hello_messages[language]["title"])
         st.text(hello_messages[language]["instruction"])
     elif menu_id == 'auth':
         asyncio.run(main_auth())
     elif menu_id == 'stocks':
         asyncio.run(run_stocks_app())
+    elif menu_id == 'production':
+        asyncio.run(run_production_app())
     elif menu_id == 'deals':
         asyncio.run(run_deals_app())
     elif menu_id == 'balances':
