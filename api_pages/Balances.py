@@ -17,15 +17,16 @@ import hydralit_components as hc
 
 from api_pages.src.company_pages import get_company_by_id
 from api_pages.src.balances_pages import get_transaction_by_id, get_transaction_by_company, get_transactions_by_period, \
-    calculate_balance, get_turnovers, get_tables, get_plot_by_category, get_plot_by_companies, get_rate_by_date
+    calculate_balance, get_turnovers, get_tables, get_plot_by_category, get_plot_by_companies, get_rate_by_date, \
+    get_debit_credit_tables, get_plot_by_separated_category, get_plot_by_separated_companies
 # from pages.src.auth_services import load_token, save_tokens, FILE_NAME
 from api_pages.src.user_footer import footer
 from api_pages.src.messages import balance_messages
 
 
 
-st.set_page_config(page_title="Deals",
-                   page_icon=":bar_chart:")
+# st.set_page_config(page_title="Deals",
+#                    page_icon=":bar_chart:")
 
 
 # cookie_manager = stx.CookieManager()
@@ -121,21 +122,52 @@ async def run_balances_app():
                     st.write(balance_messages[language]["empty"])
                 else:
                     exchange_rate = exchange_rate["usd_tl_rate"]
+                    # Получение данных из БД
+                    balances = await get_transactions_by_period(language, access_token, start_date, end_date)
+                    # Разделение данных по категориям и компаниям для анализа
+                    balance_by_category, balance_by_companies = await get_tables(exchange_rate, balances)
+                    # Углубленное разделение данных по категориям и компаниям для анализа
+                    positive_category_balances, negative_category_balances, positive_company_balances, negative_company_balances = \
+                        await get_debit_credit_tables(exchange_rate, balances)
+                    # Замена company_id на имена компаний
+                    positive_company_balances['company_name'] = positive_company_balances['company_id'].replace(
+                        {company['id']: company['company_name'] for company in companies}, inplace=True)
+                    positive_company_balances = positive_company_balances.query('balance_usd != 0').dropna(subset=['balance_usd'])
+                    # Замена company_id на имена компаний
+                    negative_company_balances['company_name'] = negative_company_balances['company_id'].replace(
+                        {company['id']: company['company_name'] for company in companies}, inplace=True)
+                    negative_company_balances = negative_company_balances.query('balance_usd != 0').dropna(subset=['balance_usd'])
+
+                    # Удаление артефактов таблиц
+                    column_to_drop = ["company_name"]
+                    positive_company_balances = positive_company_balances.drop(columns=column_to_drop)
+                    negative_company_balances = negative_company_balances.drop(columns=column_to_drop)
 
                     # Замена company_id на имена компаний
-                    balances = await get_transactions_by_period(language, access_token, start_date, end_date)
-
-                    balance_by_category, balance_by_companies = await get_tables(exchange_rate, balances)
-
                     balance_by_companies['company_name'] = balance_by_companies['company_id'].replace(
                         {company['id']: company['company_name'] for company in companies}, inplace=True)
+                    # Вывод курса
+                    st.write(balance_messages[language]["exchange_rate"], exchange_rate)
+
+                    # Вывод данных о дебиторской задолженности
+                    st.title(balance_messages[language]["recievbles"])
+                    await get_plot_by_separated_companies(language, positive_company_balances)
+                    await get_plot_by_separated_category(language, positive_category_balances)
+
+                    # Вывод данных о кредиторской задолженности
+                    st.title(balance_messages[language]["debts"])
+                    await get_plot_by_separated_companies(language, negative_company_balances)
+                    await get_plot_by_separated_category(language, negative_category_balances)
 
                     # Удаление строк с balance_usd равным 0 или отсутствующим
                     balance_by_companies = balance_by_companies.query('balance_usd != 0').dropna(subset=['balance_usd'])
-                    st.write(balance_messages[language]["exchange_rate"], exchange_rate)
+
+                    # Вывод данных об оборотах по дебиту и по кредиту
                     await get_plot_by_companies(language, balance_by_companies)
                     await get_plot_by_category(language, balance_by_category)
+
             else:
+                # Отлавливание истечения срока токена
                 st.write("ReLogin")
 
     elif page == balance_messages[language]["Total balance"]:
@@ -155,6 +187,7 @@ async def run_balances_app():
                 # Замена company_id на имена компаний
                 balance_by_companies['company_name'] = balance_by_companies['company_id'].replace(
                     {company['id']: company['company_name'] for company in companies}, inplace=True)
+
 
                 # Удаление строк с balance_usd равным 0 или отсутствующим
                 balance_by_companies = balance_by_companies.query('balance_usd != 0').dropna(subset=['balance_usd'])

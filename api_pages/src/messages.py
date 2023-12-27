@@ -72,14 +72,16 @@ hello_messages = {
      - archive of company information
     
      Currently implemented:
-      - authorization module
-      - module for viewing data on warehouse stocks
-      - module for viewing data on the purchase and sale of raw materials, goods and finished products
+      - authorization
+      - viewing data on warehouse stocks by day and in dynamics
+      - viewing data on the purchase and sale of raw materials, goods and finished products
+      - view balances for each counterparty
+      - reports on receivables and payables
      
      Work is underway to create modules:
+       - automatic production calculation,
+       - cost calculation,
        - cash flows,
-       - balances for each counterparty,
-       - reports on receivables and payables,
        - profit reports
 
      To start using and for safety reasons, you need to make sure
@@ -96,14 +98,16 @@ hello_messages = {
      - архів інформації компанії
     
      На даний момент реалізовано:
-      - модуль авторизації
-      - модуль перегляду даних про складські запаси
-      - модуль перегляду даних про закупівлю та реалізацію сировини, товарів та готової продукції
+      - Авторизація
+      - Перегляд даних про складські запаси по днях та в динаміці
+      - перегляд даних про закупівлю та реалізацію сировини, товарів та готової продукції
+      - Перегляд балансів по кожному контрагенту
+      - звіти про дебіторську та кредиторську заборгованості
      
      Ведеться робота зі створення модулів:
+       - автоматичного розрахунку виробництва,
+       - Розрахунок собівартості,
        - Руху коштів,
-       - балансів щодо кожного контрагенту,
-       - звітів про дебіторську та кредиторську заборгованості,
        - Звітів про прибуток
 
      Для початку використання та з метою безпеки потрібно переконатися
@@ -120,14 +124,16 @@ hello_messages = {
     - архиву информации компании
     
     В настоящий момент реализовано:
-     - модуль авторизации 
-     - модуль просмотра данных о складских запасах
-     - модуль просмотра данных о закупке и реализации сырья, товаров и готовой продукции
+     - авторизация 
+     - просмотр данных о складских запасах по дням и в динамике
+     - просмотр данных о закупке и реализации сырья, товаров и готовой продукции
+     - просмотр балансов по каждому контрагенту
+     - отчеты о дебиторской и кредиторской задолженностях
      
     Ведется работа по созданию модулей:
+      - автоматического расчета производства,
+      - расчета себестоимости,
       - движения денежных средств,
-      - балансов по каждому контрагенту,
-      - отчетов о дебиторской и кредиторской задолженностях,
       - отчетов о прибыли
 
     Для начала использования и в целях безопасности нужно убедиться
@@ -144,14 +150,16 @@ hello_messages = {
      - şirket bilgilerinin arşivi
     
      Şu anda uygulanıyor:
-      - yetkilendirme modülü
-      - depo stoklarına ilişkin verileri görüntülemek için modül
-      - Hammadde, mal ve bitmiş ürünlerin alım ve satımına ilişkin verileri görüntülemek için modül
+      - yetkilendirme
+      - Depo stoklarına ilişkin verilerin gün ve zamana göre görüntülenmesi
+      - Hammadde, mal ve bitmiş ürünlerin alım ve satımına ilişkin verilerin görüntülenmesi
+      - her karşı taraf için bakiyeleri görüntüleyin
+      - Alacaklar ve borçlar hakkında raporlar
      
-     Modül oluşturma çalışmaları devam ediyor:
+     Modüller oluşturmak için çalışmalar sürüyor:
+       - otomatik üretim hesaplaması,
+       - maliyet hesabı,
        - nakit akışları,
-       - her karşı taraf için bakiyeler,
-       - Alacak ve borçlara ilişkin raporlar,
        - kar raporları
 
      Kullanmaya başlamak için ve güvenlik nedeniyle şunları yaptığınızdan emin olmanız gerekir:
@@ -244,6 +252,12 @@ balance_messages = {
                      "category_balance": 'Balance by category',
                      "turnovers": "Turnovers table",
                      "by_company": "By company",
+                     "recievbles": "Receivables",
+                     "debts": "Accounts payable",
+                     "subplot_titles2": ['Balance, TL', 'Balance, USD'],
+                     'turn_category': "Turnovers by expense category",
+                     "turn_company": "Turnovers by company",
+
                      "": ""},
     "ukrainian_name": {"title": 'Список дій',
                        "Choose action": "Вибери дію",
@@ -270,6 +284,11 @@ balance_messages = {
                        "category_balance": 'Баланс за категоріями',
                        "turnovers": "Таблиця оборотів",
                        "by_company": "У розрізі компаній",
+                       "recievbles": "Дебіторська заборгованість",
+                       "debts": "Кредиторська заборгованість",
+                       "subplot_titles2": ['Баланс, TL', 'Баланс, USD'],
+                       'turn_category': "Оборот за категоріями",
+                       "turn_company": "Оборот у розрізі компаній",
                        },
 
     "russian_name": {"title": "Список действий",
@@ -297,6 +316,13 @@ balance_messages = {
                      "category_balance": 'Баланс по категориям',
                      "turnovers": "Таблица оборотов",
                      "by_company": "В разрезе компаний",
+                     "recievbles": "Дебиторская задолженность",
+                     "debts": "Кредиторская задолженность",
+                     "subplot_titles2": ['Баланс, TL', 'Баланс, USD'],
+                     'turn_category': "Оборот по категориям",
+                     "turn_company": "Оборот в разрезе компаний",
+
+                     "": "",
 
                      },
     "turkish_name": {"title": "Aksiyon listesi",
@@ -324,6 +350,12 @@ balance_messages = {
                      "category_balance": 'Kategoriye göre bakiye',
                      "turnovers": "Ciro tablosu",
                      "by_company": "Şirkete göre",
+                     "recievbles": "Alacak hesapları",
+                     "debts": "Borç hesapları",
+                     "subplot_titles2": ['Bakiye, TL', 'Bakiye, USD'],
+                     'turn_category': "Kategori bazında ciro",
+                     "turn_company": "Şirket bazında ciro",
+
                      },
 }
 

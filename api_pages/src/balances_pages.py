@@ -205,7 +205,7 @@ async def get_tables(exchange_rate, data):
     })
 
     grouped_df = pd.concat([grouped_df, totals_df], ignore_index=True)
-
+    grouped_df = grouped_df.round(2)
     # Группировка по "company_id"
     grouped_df1 = df.groupby("company_id").agg({
         "debit_turnover_tl": "sum",
@@ -240,14 +240,18 @@ async def get_tables(exchange_rate, data):
         "balance_usd": [grouped_df1["balance_usd"].sum()]
     })
 
+
     grouped_df1 = pd.concat([grouped_df1, totals_df1], ignore_index=True)
+    grouped_df1 = grouped_df1.round(2)
     # Вывод DataFrame с новыми строками итогов
+    grouped_df = grouped_df.round(2)
+    grouped_df1 = grouped_df1.round(2)
 
     return grouped_df, grouped_df1
 
 
 async def get_plot_by_category(language, data):
-    st.title(balance_messages[language]["category"])
+    st.title(balance_messages[language]["turn_category"])
     st.write(balance_messages[language]["graph"])
     # Визуализация с помощью plotly.subplots
     fig = sp.make_subplots(rows=1, cols=2, specs=[[{'type': 'pie'}, {'type': 'pie'}]],
@@ -298,7 +302,7 @@ async def get_plot_by_category(language, data):
 
 
 async def get_plot_by_companies(language, data):
-    st.title(balance_messages[language]["by_company"])
+    st.title(balance_messages[language]["turn_company"])
     st.write(balance_messages[language]["graph"])
     min_balance_usd = 1000
     # Удаление строк с абсолютным значением balance_usd меньше min_absolute_balance_usd
@@ -352,3 +356,241 @@ async def get_plot_by_companies(language, data):
     columns_to_drop = ['debit_turnover_target_usd', 'credit_turnover_target_usd', 'company_name']
     st.write(balance_messages[language]["turnovers"])
     st.write(data.drop(columns=columns_to_drop))
+
+
+async def get_debit_credit_tables(exchange_rate, data):
+    df = pd.DataFrame(data["items"])
+
+    # Преобразование валюты
+    df["debit_turnover_target_usd"] = (
+            df["debit_turnover_tl"] / exchange_rate + df["debit_turnover_usd"]
+    )
+    df["credit_turnover_target_usd"] = (
+            df["credit_turnover_tl"] / exchange_rate + df["credit_turnover_usd"]
+    )
+
+    # Расчет балансов
+    df["balance_tl"] = (
+            df["debit_turnover_tl"] - df["credit_turnover_tl"]
+            + (df["debit_turnover_usd"] - df["credit_turnover_usd"]) * exchange_rate
+    )
+
+    df["balance_usd"] = (
+            (df["debit_turnover_tl"] - df["credit_turnover_tl"]) / exchange_rate
+            + df["debit_turnover_usd"] - df["credit_turnover_usd"]
+    )
+
+    # Видалення рядків з балансом = 0
+    df = df.round(2)
+    # non_zero_balances_df = df[df["balance_usd"] != 0]
+    non_zero_balances_df = df
+
+
+    # Розділення на позитивні та негативні баланси
+    positive_category_balances = non_zero_balances_df[non_zero_balances_df["balance_usd"] > 0]
+    negative_category_balances = non_zero_balances_df[non_zero_balances_df["balance_usd"] < 0]
+
+
+    # Групування по "expenses_category"
+    grouped_positive_category_balances = positive_category_balances.groupby("expenses_category").agg({
+        "debit_turnover_tl": "sum",
+        "credit_turnover_tl": "sum",
+        "debit_turnover_usd": "sum",
+        "credit_turnover_usd": "sum",
+        "balance_tl": "sum",
+        "balance_usd": "sum"
+    }).reset_index()
+
+    grouped_negative_category_balances = negative_category_balances.groupby("expenses_category").agg({
+        "debit_turnover_tl": "sum",
+        "credit_turnover_tl": "sum",
+        "debit_turnover_usd": "sum",
+        "credit_turnover_usd": "sum",
+        "balance_tl": "sum",
+        "balance_usd": "sum"
+    }).reset_index()
+
+    # Групування по "company_id"
+    grouped_positive_company_balances = positive_category_balances.groupby("company_id").agg({
+        "debit_turnover_tl": "sum",
+        "credit_turnover_tl": "sum",
+        "debit_turnover_usd": "sum",
+        "credit_turnover_usd": "sum",
+        "balance_tl": "sum",
+        "balance_usd": "sum"
+    }).reset_index()
+
+    grouped_negative_company_balances = negative_category_balances.groupby("company_id").agg({
+        "debit_turnover_tl": "sum",
+        "credit_turnover_tl": "sum",
+        "debit_turnover_usd": "sum",
+        "credit_turnover_usd": "sum",
+        "balance_tl": "sum",
+        "balance_usd": "sum"
+    }).reset_index()
+
+    # Добавление строк итогов
+    totals_positive_category_balances = pd.DataFrame({
+        "expenses_category": ["Total"],
+        "debit_turnover_tl": [grouped_positive_category_balances["debit_turnover_tl"].sum()],
+        "credit_turnover_tl": [grouped_positive_category_balances["credit_turnover_tl"].sum()],
+        "debit_turnover_usd": [grouped_positive_category_balances["debit_turnover_usd"].sum()],
+        "credit_turnover_usd": [grouped_positive_category_balances["credit_turnover_usd"].sum()],
+        "balance_tl": [grouped_positive_category_balances["balance_tl"].sum()],
+        "balance_usd": [grouped_positive_category_balances["balance_usd"].sum()]
+    })
+
+    totals_negative_category_balances = pd.DataFrame({
+        "expenses_category": ["Total"],
+        "debit_turnover_tl": [grouped_negative_category_balances["debit_turnover_tl"].sum()],
+        "credit_turnover_tl": [grouped_negative_category_balances["credit_turnover_tl"].sum()],
+        "debit_turnover_usd": [grouped_negative_category_balances["debit_turnover_usd"].sum()],
+        "credit_turnover_usd": [grouped_negative_category_balances["credit_turnover_usd"].sum()],
+        "balance_tl": [grouped_negative_category_balances["balance_tl"].sum()],
+        "balance_usd": [grouped_negative_category_balances["balance_usd"].sum()]
+    })
+
+    totals_positive_company_balances = pd.DataFrame({
+        "company_id": ["Total"],
+        "debit_turnover_tl": [grouped_positive_company_balances["debit_turnover_tl"].sum()],
+        "credit_turnover_tl": [grouped_positive_company_balances["credit_turnover_tl"].sum()],
+        "debit_turnover_usd": [grouped_positive_company_balances["debit_turnover_usd"].sum()],
+        "credit_turnover_usd": [grouped_positive_company_balances["credit_turnover_usd"].sum()],
+        "balance_tl": [grouped_positive_company_balances["balance_tl"].sum()],
+        "balance_usd": [grouped_positive_company_balances["balance_usd"].sum()]
+    })
+
+    totals_negative_company_balances = pd.DataFrame({
+        "company_id": ["Total"],
+        "debit_turnover_tl": [grouped_negative_company_balances["debit_turnover_tl"].sum()],
+        "credit_turnover_tl": [grouped_negative_company_balances["credit_turnover_tl"].sum()],
+        "debit_turnover_usd": [grouped_negative_company_balances["debit_turnover_usd"].sum()],
+        "credit_turnover_usd": [grouped_negative_company_balances["credit_turnover_usd"].sum()],
+        "balance_tl": [grouped_negative_company_balances["balance_tl"].sum()],
+        "balance_usd": [grouped_negative_company_balances["balance_usd"].sum()]
+    })
+
+    grouped_positive_category_balances = pd.concat([grouped_positive_category_balances, totals_positive_category_balances], ignore_index=True)
+    grouped_negative_category_balances = pd.concat([grouped_negative_category_balances, totals_negative_category_balances], ignore_index=True)
+    grouped_positive_company_balances = pd.concat([grouped_positive_company_balances, totals_positive_company_balances], ignore_index=True)
+    grouped_negative_company_balances = pd.concat([grouped_negative_company_balances, totals_negative_company_balances], ignore_index=True)
+
+
+
+    return grouped_positive_category_balances, grouped_negative_category_balances, grouped_positive_company_balances, grouped_negative_company_balances
+
+
+async def get_plot_by_separated_category(language, data):
+    st.title(balance_messages[language]["category"])
+    st.write(balance_messages[language]["graph"])
+    min_balance_usd = 10
+    # Удаление строк с абсолютным значением balance_usd меньше min_absolute_balance_usd
+    data_for_graph0 = data.query(f'abs(balance_usd) >= {min_balance_usd}')
+    data_for_graph0["balance_usd_abs"] = data_for_graph0["balance_usd"].abs()
+    data_for_graph0["balance_tl_abs"] = data_for_graph0["balance_tl"].abs()
+    # Визуализация с помощью plotly.subplots
+    fig = sp.make_subplots(rows=1, cols=2, specs=[[{'type': 'pie'}, {'type': 'pie'}]],
+                           subplot_titles=balance_messages[language]["subplot_titles2"])
+
+    # By tl
+    trace_product = (px.pie(
+        data_for_graph0.query('expenses_category != "Total"'),
+        values='balance_tl_abs',
+        names='expenses_category',
+        hole=0.2,
+        color_discrete_sequence=px.colors.qualitative.Set1,
+    )).update_traces(name=balance_messages[language]["debit_usd"])
+    fig.add_trace(trace_product.data[0], row=1, col=1)
+
+    # By usd
+    trace_product = (px.pie(
+        data_for_graph0.query('expenses_category != "Total"'),
+        values='balance_usd_abs',
+        names='expenses_category',
+        hole=0.2,
+        color_discrete_sequence=px.colors.qualitative.Vivid,
+    )).update_traces(name=balance_messages[language]["credit_usd"])
+    fig.add_trace(trace_product.data[0], row=1, col=2)
+
+    fig.update_layout()
+
+    # Визуализация с помощью plotly.express
+    fig2 = px.bar(
+        data_for_graph0.query('expenses_category != "Total"'),
+        x='expenses_category',
+        y=['balance_usd'],
+        barmode='group',
+        color_discrete_sequence=['green'],
+        labels={'balance_usd': 'Баланс'},
+        title=balance_messages[language]["category_balance"]
+    )
+
+    # Вывод графика
+    st.plotly_chart(fig2)
+    # Вывод графика
+    st.plotly_chart(fig)
+
+    # Указать ненужные столбцы
+    columns_to_drop = ['debit_turnover_usd', 'credit_turnover_usd', 'debit_turnover_tl', 'credit_turnover_tl', 'balance_usd_abs', 'balance_tl_abs']
+    st.write(balance_messages[language]["category_balance"])
+    st.write(data_for_graph0.drop(columns=columns_to_drop))
+
+
+async def get_plot_by_separated_companies(language, data):
+    st.title(balance_messages[language]["by_company"])
+    st.write(balance_messages[language]["graph"])
+    min_balance_usd = 10
+    # Удаление строк с абсолютным значением balance_usd меньше min_absolute_balance_usd
+    data_for_graph = data.query(f'abs(balance_usd) >= {min_balance_usd}')
+    data_for_graph["balance_usd_abs"] = data_for_graph["balance_usd"].abs()
+    data_for_graph["balance_tl_abs"] = data_for_graph["balance_tl"].abs()
+    # data_for_graph = data.query(f'balance_usd >= {min_balance_usd}')
+
+    # Визуализация с помощью plotly.subplots
+    fig = sp.make_subplots(rows=1, cols=2, specs=[[{'type': 'pie'}, {'type': 'pie'}]],
+                           subplot_titles=balance_messages[language]["subplot_titles2"])
+
+    # By tl
+    trace_product = (px.pie(
+        data_for_graph.query('company_id != "Total"'),
+        values='balance_tl_abs',
+        names='company_id',
+        hole=0.2,
+        color_discrete_sequence=px.colors.qualitative.Set1,
+    )).update_traces(name=balance_messages[language]["debit_usd"])
+    fig.add_trace(trace_product.data[0], row=1, col=1)
+
+    # By usd
+    trace_product = (px.pie(
+        data_for_graph.query('company_id != "Total"'),
+        values='balance_usd_abs',
+        names='company_id',
+        hole=0.2,
+        color_discrete_sequence=px.colors.qualitative.Vivid,
+    )).update_traces(name=balance_messages[language]["credit_usd"])
+    fig.add_trace(trace_product.data[0], row=1, col=2)
+
+    fig.update_layout()
+
+    # Визуализация с помощью plotly.express
+    fig2 = px.bar(
+        data_for_graph.query('company_id != "Total"'),
+        x='company_id',
+        y=['balance_usd'],
+        barmode='group',
+        color_discrete_sequence=['green'],
+        labels={'balance_usd': 'Баланс'},
+        title=balance_messages[language]["Balance per company"]
+    )
+
+    # Вывод графика
+    st.plotly_chart(fig2)
+    # Вывод графика
+    st.plotly_chart(fig)
+
+    # Указать ненужные столбцы
+    columns_to_drop = ['debit_turnover_usd', 'credit_turnover_usd', 'debit_turnover_tl', 'credit_turnover_tl', 'balance_usd_abs', 'balance_tl_abs']
+    st.write(balance_messages[language]["Balance per company"])
+    st.write(data_for_graph.drop(columns=columns_to_drop))
+
+
