@@ -171,7 +171,7 @@ async def run_balances_app():
                 st.write("ReLogin")
 
     elif page == balance_messages[language]["Total balance"]:
-        end_date = pd.to_datetime(f"2023-11-30")
+        end_date = pd.to_datetime(f"2023-12-31")
         response = get_company_by_id(access_token, "")
         if response.get("items", 0):
             companies = response["items"]
