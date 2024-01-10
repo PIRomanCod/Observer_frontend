@@ -66,8 +66,8 @@ async def run_production_app():
                 # Сортування за датою
                 stocks_data = stocks_data.sort_values(by='date')
 
-                st.write("Stocks data")
-                st.write(stocks_data)
+                # st.write("Stocks data")
+                # st.write(stocks_data)
 
             deals_data_from_db = get_deals_by_period(access_token, start_date, end_date)
             if len(deals_data_from_db["items"]) > 1:
@@ -101,22 +101,22 @@ async def run_production_app():
 
                 # Підрахунок суми за стовпцем "quantity" для знайдених рядків
                 total_quantity_for_minus = non_stock_deals_row1['quantity'].sum()
-                st.write(non_stock_deals_row1)
-                st.write(total_quantity_for_minus)
+                # st.write(non_stock_deals_row1)
+                # st.write(total_quantity_for_minus)
 
 
                 # Список ідентифікаторів товарів, по яким потрібно відфільтрувати щоб додати до виробництва
-                selected_product_ids = [21]  # додайте всі необхідні ідентифікатори
+                selected_product_ids2 = [21]  # додайте всі необхідні ідентифікатори
                 non_stock_deals_row2 = deals_data[
-                    (deals_data['product_id'].isin(selected_product_ids))]
+                    (deals_data['product_id'].isin(selected_product_ids2))]
 
                 # Підрахунок суми за стовпцем "quantity" для знайдених рядків
                 total_quantity_for_plus = non_stock_deals_row2['quantity'].sum()
                 st.write(non_stock_deals_row2)
                 st.write(total_quantity_for_plus)
 
-                st.write("Deals data")
-                st.write(deals_data)
+                # st.write("Deals data")
+                # st.write(deals_data)
 
             # Створення нового стовпця для виробництва
             stocks_data['production'] = 0.0
@@ -180,7 +180,7 @@ async def run_production_app():
             total_production = pd.concat([total_production, total_row], ignore_index=True)
 
             st.write(total_production)
-            st.write(stocks_data)
+            # st.write(stocks_data)
 
 
     except TypeError as e:
