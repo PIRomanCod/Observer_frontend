@@ -124,7 +124,7 @@ async def run_deals_app():
         with st.sidebar:
             # Вибір місяця та року користувачем
             selected_month = st.selectbox(deals_messages[language]["Choose month"], list(calendar.month_name)[1:])
-            selected_year = st.selectbox(deals_messages[language]["Choose year"], range(2020, 2024))
+            selected_year = st.selectbox(deals_messages[language]["Choose year"], range(2020, 2025))
 
             # Отримання числа місяця за його іменем
             month_number = list(calendar.month_name).index(selected_month)
