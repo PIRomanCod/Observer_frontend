@@ -112,8 +112,8 @@ async def run_production_app():
 
                 # Підрахунок суми за стовпцем "quantity" для знайдених рядків
                 total_quantity_for_plus = non_stock_deals_row2['quantity'].sum()
-                st.write(non_stock_deals_row2)
-                st.write(total_quantity_for_plus)
+                # st.write(non_stock_deals_row2)
+                # st.write(total_quantity_for_plus)
 
                 # st.write("Deals data")
                 # st.write(deals_data)
