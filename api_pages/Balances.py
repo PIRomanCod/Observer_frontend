@@ -98,7 +98,7 @@ async def run_balances_app():
         with st.sidebar:
             # Вибір місяця та року користувачем
             selected_month = st.selectbox(balance_messages[language]["Choose month"], list(calendar.month_name)[1:])
-            selected_year = st.selectbox(balance_messages[language]["Choose year"], range(2020, 2024))
+            selected_year = st.selectbox(balance_messages[language]["Choose year"], range(2020, 2025))
             continiously = st.selectbox(balance_messages[language]["cumulative"], ["True", "False"])
             # Отримання числа місяця за його іменем
             month_number = list(calendar.month_name).index(selected_month)
