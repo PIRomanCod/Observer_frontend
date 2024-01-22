@@ -208,7 +208,7 @@ async def run_balances_app():
 
 
                 # Удаление строк с balance_usd равным 0 или отсутствующим
-                # balance_by_companies = balance_by_companies.query('balance_usd != 0').dropna(subset=['balance_usd'])
+                balance_by_companies = balance_by_companies.query('balance_usd != 0').dropna(subset=['balance_usd'])
                 st.write("exchange_rate", exchange_rate)
                 await get_plot_by_companies(language, balance_by_companies)
                 await get_plot_by_category(language, balance_by_category)
