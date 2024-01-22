@@ -92,6 +92,8 @@ async def run_balances_app():
                 balance_tl, balance_usd = await calculate_balance(result)
                 st.write(f"{balance_messages[language]['current balance']} {company_name.capitalize()} : {balance_tl} TL")
                 st.write(f"{balance_messages[language]['current balance']} {company_name.capitalize()} : {balance_usd} USD")
+                st.write(pd.DataFrame(result["items"]))
+
         except KeyError:
             st.write("ReLogin")
     elif page == balance_messages[language]["Balance per period"]:
