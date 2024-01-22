@@ -92,7 +92,10 @@ async def run_balances_app():
                 balance_tl, balance_usd = await calculate_balance(result)
                 st.write(f"{balance_messages[language]['current balance']} {company_name.capitalize()} : {balance_tl} TL")
                 st.write(f"{balance_messages[language]['current balance']} {company_name.capitalize()} : {balance_usd} USD")
-                st.write(pd.DataFrame(result["items"]))
+                transaction_list = pd.DataFrame(result["items"])
+                columns_to_drop = ['eur_usd_rate', 'usd_tl_rate', 'is_deleted', 'user_id',
+                                   'accounting_type', 'document_type', 'operation_region']
+                st.write(transaction_list.drop(columns=columns_to_drop))
 
         except KeyError:
             st.write("ReLogin")
