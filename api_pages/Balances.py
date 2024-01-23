@@ -185,7 +185,7 @@ async def run_balances_app():
             while True:
                 exchange_rate = await get_rate_by_date(language, access_token, end_date)
                 # Check if exchange_rate exists for the current end_date
-                if exchange_rate.get("usd_tl_rate") is not None:
+                if isinstance(exchange_rate, dict) and exchange_rate.get("usd_tl_rate") is not None:
                     break  # Exit the loop if exchange_rate exists for the current end_date
                 # Move to the previous day
                 end_date -= pd.Timedelta(days=1)
