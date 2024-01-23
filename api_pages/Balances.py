@@ -122,7 +122,20 @@ async def run_balances_app():
             response = get_company_by_id(access_token, "")
             if response.get("items", 0):
                 companies = response["items"]
-                exchange_rate = await get_rate_by_date(language, access_token, end_date)
+                while True:
+                    exchange_rate = await get_rate_by_date(language, access_token, end_date)
+                    # Check if exchange_rate exists for the current end_date
+                    if isinstance(exchange_rate, dict) and exchange_rate.get("usd_tl_rate") is not None:
+                        break  # Exit the loop if exchange_rate exists for the current end_date
+                    # Move to the previous day
+                    end_date -= pd.Timedelta(days=1)
+
+                    # Add a check to prevent an infinite loop in case data is missing
+                    if end_date < pd.to_datetime("2023-01-01"):
+                        break
+
+                exchange_rate = exchange_rate["usd_tl_rate"]
+                # exchange_rate = await get_rate_by_date(language, access_token, end_date)
                 if type(exchange_rate) == str:
                     st.write(balance_messages[language]["empty"])
                 else:
