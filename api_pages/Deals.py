@@ -244,7 +244,7 @@ async def run_deals_app():
                 else:
                     st.write(deals_messages[language]["empty"])
             except TypeError:
-                st.write("ReLogin")
+                st.write("Please LogIn to continue")
 
     # save_tokens(access_token, refresh_token)
 
