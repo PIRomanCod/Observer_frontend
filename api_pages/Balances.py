@@ -226,7 +226,7 @@ async def run_balances_app():
                 await get_plot_by_companies(language, balance_by_companies)
                 await get_plot_by_category(language, balance_by_category)
         else:
-            st.write("ReLogin")
+            st.write("Please LogIn to continue")
     # else:
     #     auth_manager.refresh_token_in_background()
     #     access_token, refresh_token = auth_manager.get_tokens()

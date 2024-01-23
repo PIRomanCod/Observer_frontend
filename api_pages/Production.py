@@ -186,7 +186,7 @@ async def run_production_app():
 
 
     except TypeError as e:
-        st.write(f"Please LogIn to continue //n {e}")
+        st.write(f"Please LogIn to continue")# //n {e}")
 
 # st.write(st.session_state)
 
