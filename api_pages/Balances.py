@@ -139,7 +139,7 @@ async def run_balances_app():
                 if type(exchange_rate) == str:
                     st.write(balance_messages[language]["empty"])
                 else:
-                    exchange_rate = exchange_rate["usd_tl_rate"]
+                    # exchange_rate = exchange_rate["usd_tl_rate"]
                     # Получение данных из БД
                     balances = await get_transactions_by_period(language, access_token, start_date, end_date)
                     # Разделение данных по категориям и компаниям для анализа
