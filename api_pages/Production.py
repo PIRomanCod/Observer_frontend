@@ -168,10 +168,12 @@ async def run_production_app():
             total_production = stocks_data.groupby('product')['production'].sum().reset_index()
 
             # # Додаємо суму total_quantity_for_minus до виробництва продуктів з ідентифікаторами 18 та 12
-            total_production.loc[total_production['product'].isin(["Crude sunoil"]), 'production'] -= total_quantity_for_minus
+            total_production.loc[total_production['product'].isin(["Crude sunoil", "Сира соняшникова олія",
+            "Сырое подсолнечное масло", "ham ayçi̇cek yağ"]), 'production'] -= total_quantity_for_minus
 
             # Додаємо суму total_quantity_for_plus до виробництва продуктів з ідентифікатором 21
-            total_production.loc[total_production['product'].isin(["Crude sunoil"]), 'production'] += total_quantity_for_plus
+            total_production.loc[total_production['product'].isin(["Crude sunoil", "Сира соняшникова олія",
+            "Сырое подсолнечное масло", "ham ayçi̇cek yağ"]), 'production'] += total_quantity_for_plus
 
 
             # Додаємо рядок "total" в групований датафрейм та обчислюємо суму для 'production'
