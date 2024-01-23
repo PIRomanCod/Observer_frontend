@@ -106,7 +106,7 @@ async def run_production_app():
 
 
                 # Список ідентифікаторів товарів, по яким потрібно відфільтрувати щоб додати до виробництва
-                selected_product_ids2 = [21]  # додайте всі необхідні ідентифікатори
+                selected_product_ids2 = [21, 2]  # додайте всі необхідні ідентифікатори
                 non_stock_deals_row2 = deals_data[
                     (deals_data['product_id'].isin(selected_product_ids2))]
 
