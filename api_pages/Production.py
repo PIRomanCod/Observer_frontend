@@ -78,7 +78,7 @@ async def run_production_app():
                 # Сортування за датою
                 deals_data = deals_data.sort_values(by='date')
                 # Отримання назв товарів
-                products_data = get_product_data("english_name", access_token)
+                products_data = get_product_data(language, access_token) #"english_name"
                 products_dict = {product["id"]: product["name"] for product in products_data}
                 deals_data["product"] = deals_data["product_id"].map(products_dict)
 
