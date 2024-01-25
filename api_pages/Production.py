@@ -69,7 +69,7 @@ async def run_production_app():
                 # st.write("Stocks data")
                 # st.write(stocks_data)
 
-            deals_data_from_db = get_deals_by_period(access_token, start_date, end_date)
+            deals_data_from_db = get_deals_by_period(access_token, start_date, end_date_for_stocks) #end_date
             if len(deals_data_from_db["items"]) > 1:
                 deals_data = pd.DataFrame(deals_data_from_db["items"])
 
