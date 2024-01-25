@@ -69,7 +69,7 @@ async def run_production_app():
                 # st.write("Stocks data")
                 # st.write(stocks_data)
 
-            deals_data_from_db = get_deals_by_period(access_token, start_date, end_date_for_stocks) #end_date
+            deals_data_from_db = get_deals_by_period(access_token, start_date, end_date) #end_date
             if len(deals_data_from_db["items"]) > 1:
                 deals_data = pd.DataFrame(deals_data_from_db["items"])
 
@@ -135,7 +135,7 @@ async def run_production_app():
                 # Знаходження відповідного рядка у stocks_data за попередній день та товаром
                 prev_stocks_row = stocks_data[(stocks_data['date'] == prev_date) & (stocks_data['product'] == product_id)]
                 # prev_deals_row = deals_data[(deals_data['date'] == prev_date) & (deals_data['product_id'] == product_id)]
-                prev_deals_rows = deals_data[(deals_data['date'] == prev_date) & (deals_data['product'] == product_id)]
+                prev_deals_rows = deals_data[(deals_data['date'] == date) & (deals_data['product'] == product_id)] #prev_date
 
                 # st.write("prev_stocks", prev_stocks_row)
                 today_stock = stocks_row.iloc[0]["quantity"]
