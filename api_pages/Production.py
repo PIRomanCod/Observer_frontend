@@ -45,7 +45,7 @@ async def run_production_app():
             start_date_for_stocks = start_date - timedelta(days=1)
             end_date_for_stocks = end_date + timedelta(days=1)
 
-        parameters = get_query_params(language, selected_products, start_date_for_stocks.strftime('%Y-%m-%d'), end_date_for_stocks.strftime('%Y-%m-%d'))
+        parameters = get_query_params(language, selected_products, start_date_for_stocks.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'))
 
         if st.sidebar.button("GO"):
             stock_data_from_db = get_db_data(access_token, parameters)
