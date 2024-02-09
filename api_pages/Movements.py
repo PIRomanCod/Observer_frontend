@@ -36,15 +36,17 @@ async def run_movements_app():
 
     if page == movements_messages[language]["Rests for now"]:
         if st.button("GO"):
-            with hc.HyLoader('Now doing loading, wait please', hc.Loaders.pulse_bars):
-                time.sleep(1)
+            try:
+                with hc.HyLoader('Now doing loading, wait please', hc.Loaders.pulse_bars):
+                    time.sleep(1)
 
-            result = await get_movements_by_multifilter(language, access_token)
-            st.write(await get_total(language, result))
-            await get_chart(language, result)
-            st.write(movements_messages[language]["Details"])
-            st.write(result)
-
+                result = await get_movements_by_multifilter(language, access_token)
+                st.write(await get_total(language, result))
+                await get_chart(language, result)
+                st.write(movements_messages[language]["Details"])
+                st.write(result)
+            except TypeError:
+                st.write("ReLogin")
 
 if __name__ == '__main__':
     asyncio.run(run_movements_app())
