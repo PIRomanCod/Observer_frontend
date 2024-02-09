@@ -359,3 +359,49 @@ balance_messages = {
                      },
 }
 
+movements_messages = {
+    "english_name": {"title": "Action list",
+                     "Choose action": "Choose action",
+                     "Rests for now": "Rests for now",
+                     "Last date of movements": "Last date of money's movements:",
+                     "Rest by Banks": "Balances by banks",
+                     "Rest by Currency": "Balances by currency",
+                     "Details": "Details",
+                     "Total by currency": "Total by currency",
+                     "": "",
+                    },
+
+    "ukrainian_name": {"title": 'Список дій',
+                       "Choose action": "Вибери дію",
+                       "Rests for now": "Поточні залишки",
+                       "Last date of movements": "Дата останнього руху коштів",
+                       "Rest by Banks": "Баланс за банком",
+                       "Rest by Currency": "Баланс за валютою",
+                       "Details": "Докладно",
+                       "Total by currency": "Всього за валютами",
+
+                       },
+
+    "russian_name": {"title": "Список действий",
+                     "Choose action": "Выбрать действие",
+                     "Rests for now": "Текущие остатки",
+                     "Last date of movements": "Дата последнего движения средств",
+                     "Rest by Banks": "Баланс по банкам" ,
+                     "Rest by Currency": "Баланс по валютам",
+                     "Details": "Подробно",
+                     "Total by currency": "Всего в разрезе валют",
+
+                     },
+
+    "turkish_name": {"title": "Aksiyon listesi",
+                     "Choose action": "Eylem seçin",
+                     "Rests for now": "Mevcut bakiyeler",
+                     "Last date of movements": "Para hareketlerinin son tarihi",
+                     "Rest by Banks": "Banka bakiyeleri",
+                     "Rest by Currency": "Dövize göre bakiye",
+                     "Details": "Detaylar",
+                     "Total by currency": "Para birimine göre toplam",
+                     "": "",
+
+                     },
+}
