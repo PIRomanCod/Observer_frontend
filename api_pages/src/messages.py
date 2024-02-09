@@ -67,17 +67,17 @@ hello_messages = {
     "english_name": {"title": "Welcome to Company observer",
                      "instruction": """
      This application was created to provide quick access to:
-    
+
      – current state of affairs in the company
      - archive of company information
-    
+
      Currently implemented:
       - authorization
       - viewing data on warehouse stocks by day and in dynamics
       - viewing data on the purchase and sale of raw materials, goods and finished products
       - view balances for each counterparty
       - reports on receivables and payables
-     
+
      Work is underway to create modules:
        - automatic production calculation,
        - cost calculation,
@@ -93,17 +93,17 @@ hello_messages = {
     "ukrainian_name": {"title": "Ласкаво просимо в Company observer",
                        "instruction": """
      Ця програма створена для надання оперативного доступу до:
-    
+
      - поточний стан справ у компанії
      - архів інформації компанії
-    
+
      На даний момент реалізовано:
       - Авторизація
       - Перегляд даних про складські запаси по днях та в динаміці
       - перегляд даних про закупівлю та реалізацію сировини, товарів та готової продукції
       - Перегляд балансів по кожному контрагенту
       - звіти про дебіторську та кредиторську заборгованості
-     
+
      Ведеться робота зі створення модулів:
        - автоматичного розрахунку виробництва,
        - Розрахунок собівартості,
@@ -119,17 +119,17 @@ hello_messages = {
     "russian_name": {"title": "Добро пожаловать в Company observer",
                      "instruction": """ 
     Это приложение создано для предоставления оперативного доступа к:
-    
+
     - текущему состоянию дел в компании
     - архиву информации компании
-    
+
     В настоящий момент реализовано:
      - авторизация 
      - просмотр данных о складских запасах по дням и в динамике
      - просмотр данных о закупке и реализации сырья, товаров и готовой продукции
      - просмотр балансов по каждому контрагенту
      - отчеты о дебиторской и кредиторской задолженностях
-     
+
     Ведется работа по созданию модулей:
       - автоматического расчета производства,
       - расчета себестоимости,
@@ -145,17 +145,17 @@ hello_messages = {
     "turkish_name": {"title": "Şirket incelemesine hoş geldiniz",
                      "instruction": """
      Bu uygulama aşağıdakilere hızlı erişim sağlamak için oluşturuldu:
-    
+
      - şirketteki mevcut durum
      - şirket bilgilerinin arşivi
-    
+
      Şu anda uygulanıyor:
       - yetkilendirme
       - Depo stoklarına ilişkin verilerin gün ve zamana göre görüntülenmesi
       - Hammadde, mal ve bitmiş ürünlerin alım ve satımına ilişkin verilerin görüntülenmesi
       - her karşı taraf için bakiyeleri görüntüleyin
       - Alacaklar ve borçlar hakkında raporlar
-     
+
      Modüller oluşturmak için çalışmalar sürüyor:
        - otomatik üretim hesaplaması,
        - maliyet hesabı,
@@ -196,7 +196,7 @@ deals_messages = {
                        "full": "Докладно",
                        "sell": "Реалізація товарів за місяць",
                        "empty": "Немає даних для обраного періоду",
-},
+                       },
 
     "russian_name": {"subplot_titles": ['Товары, USD', 'Компании, USD', 'Товары, тн'],
                      "title": "Список действий",
@@ -209,7 +209,7 @@ deals_messages = {
                      "price": "Средневзвешенные цены",
                      "full": "Подробно",
                      "sell": "Реализация товаров за месяц",
-                       "empty": "Нет данных за выбранный период",
+                     "empty": "Нет данных за выбранный период",
                      },
     "turkish_name": {"subplot_titles": ['Mal, ABD Doları', 'Şirketler, ABD Doları', 'Mal, tn'],
                      "title": "Aksiyon listesi",
@@ -301,7 +301,7 @@ balance_messages = {
                      "price": "Средневзвешенные цены",
                      "full": "Подробно",
                      "sell": "Реализация товаров за месяц",
-                       "empty": "Нет данных за выбранный период",
+                     "empty": "Нет данных за выбранный период",
                      "choose": "выберите компанию: ",
                      "current balance": "Текущий баланс с - ",
                      "cumulative": "Нарастающим итогом",
@@ -369,7 +369,7 @@ movements_messages = {
                      "Details": "Details",
                      "Total by currency": "Total by currency",
                      "": "",
-                    },
+                     },
 
     "ukrainian_name": {"title": 'Список дій',
                        "Choose action": "Вибери дію",
@@ -386,7 +386,7 @@ movements_messages = {
                      "Choose action": "Выбрать действие",
                      "Rests for now": "Текущие остатки",
                      "Last date of movements": "Дата последнего движения средств",
-                     "Rest by Banks": "Баланс по банкам" ,
+                     "Rest by Banks": "Баланс по банкам",
                      "Rest by Currency": "Баланс по валютам",
                      "Details": "Подробно",
                      "Total by currency": "Всего в разрезе валют",
