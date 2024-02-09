@@ -13,31 +13,10 @@ from api_pages.Authorization import main_auth
 from api_pages.Balances import run_balances_app
 from api_pages.Stocks_viewer import run_stocks_app
 from api_pages.Production import run_production_app
+from api_pages.Movements import run_movements_app
 
-
-# st.set_page_config(page_title="Company observer",
-#                    page_icon="chart_with_upwards_trend")
 
 st.write(css, unsafe_allow_html=True)
-# st.write("""
-#
-#
-#
-# """)
-
-# cookie_manager = stx.CookieManager(key="start_key01")
-# cookies = cookie_manager.get_all(key="start_key02")
-
-
-
-
-# menu_data = [
-#     {'id': 'english_name', 'label': "english"},
-#     {'id': 'ukrainian_name', 'label': "українська"},
-#     {'id': 'russian_name', 'label': "русский"},
-#     {'id': 'turkish_name', 'label': "türkçe"},
-# ]
-
 
 menu_data = [
     {'id': 'home', 'label': "Home"},
@@ -46,6 +25,7 @@ menu_data = [
     {'id': 'production', 'label': "Production"},
     {'id': 'deals', 'label': "Deals"},
     {'id': 'balances', 'label': "Balances"},
+    {'id': 'movements', 'label': "Movements"},
 
 ]
 
@@ -67,7 +47,7 @@ menu_id = hc.nav_bar(
 # Отримання значення з st.session_state або встановлення значення за замовчуванням
 selected_language = st.session_state.get("selected_language", "english_name")
 
-
+auth_manager = None
 
 
 def main():
@@ -101,6 +81,8 @@ def main():
         asyncio.run(run_deals_app())
     elif menu_id == 'balances':
         asyncio.run(run_balances_app())
+    elif menu_id == 'movements':
+        asyncio.run(run_movements_app())
     elif menu_id == 'login_name':
         profile_page(st.session_state.get("access_token", ""))
 
