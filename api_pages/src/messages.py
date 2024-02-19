@@ -368,6 +368,12 @@ movements_messages = {
                      "Rest by Currency": "Balances by currency",
                      "Details": "Details",
                      "Total by currency": "Total by currency",
+                     "Movements by bank": "Movements by bank",
+                     "Payment_way": "Bank",
+                     "All for period": "All for period",
+                     "Threshold for tl": "Threshold for tl",
+                     "Show self movements?": "Show self movements?",
+                     "Chart title": "Visualization of cash flow",
                      "": "",
                      },
 
@@ -379,6 +385,12 @@ movements_messages = {
                        "Rest by Currency": "Баланс за валютою",
                        "Details": "Докладно",
                        "Total by currency": "Всього за валютами",
+                       "Movements by bank": "Рух коштів по банкам",
+                       "Payment_way": "Банк",
+                       "All for period": "Рух по всім банкам за період",
+                       "Threshold for tl": "Нижня межа платежів",
+                       "Show self movements?": "Відобразити внутрішні переводи?",
+                       "Chart title": "Візуалізація руху грошових коштів",
 
                        },
 
@@ -390,7 +402,12 @@ movements_messages = {
                      "Rest by Currency": "Баланс по валютам",
                      "Details": "Подробно",
                      "Total by currency": "Всего в разрезе валют",
-
+                     "Movements by bank": "Движение средств по банкам",
+                     "Payment_way": "Банк",
+                     "All for period": "Движение по всем банкам за период",
+                     "Threshold for tl": "Нижняя граница платежей",
+                     "Show self movements?": "Отображать внутренние переводы?",
+                     "Chart title": "Визуализация движения денежных средств",
                      },
 
     "turkish_name": {"title": "Aksiyon listesi",
@@ -401,6 +418,12 @@ movements_messages = {
                      "Rest by Currency": "Dövize göre bakiye",
                      "Details": "Detaylar",
                      "Total by currency": "Para birimine göre toplam",
+                     "Movements by bank": "Bankalara göre hareketler",
+                     "Payment_way": "Banka",
+                     "All for period": "Döneme ilişkin tüm bankalardaki hareket",
+                     "Threshold for tl": "Daha düşük ödeme limiti",
+                     "Show self movements?": "Dahili transferler gösterilsin mi?",
+                     "Chart title": "Nakit akışının görselleştirilmesi",
                      "": "",
 
                      },
