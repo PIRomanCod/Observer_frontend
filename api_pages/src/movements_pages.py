@@ -40,7 +40,7 @@ async def get_movements_by_multifilter(language, acc_token):
     # Опциональные параметры запроса, если есть
     params = {
         "offset": 0,
-        "limit": 2000#,
+        "limit": 5000#,
         #"currency": "usd"
         # ,
         # "payment_way": 16
