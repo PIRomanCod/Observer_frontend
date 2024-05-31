@@ -68,77 +68,62 @@ hello_messages = {
                      "instruction": """
      This application was created to provide quick access to:
 
-     – current state of affairs in the company
-     - archive of company information
+ - the state of operation capital on the selected date
+ - current prices for raw materials, goods and finished products
+ - production volumes
+ - stock status
+ - cash flow
+ - the state of accounts receivable and accounts payable
+ - balance for each counterparty
+ - archive of company information
 
-     Currently implemented:
-      - authorization
-      - viewing data on warehouse stocks by day and in dynamics
-      - viewing data on the purchase and sale of raw materials, goods and finished products
-      - view balances for each counterparty
-      - reports on receivables and payables
+ To start using and for safety reasons, you need to make sure that
+ that you are an authorized user.
 
-     Work is underway to create modules:
-       - automatic production calculation,
-       - cost calculation,
-       - cash flows,
-       - profit reports
-
-     To start using and for safety reasons, you need to make sure
-      that you are an authorized user,
-     - so first register,
-     - confirm your email,
-     - log in.
+ How to see more?
+ - first, register
+ - confirm your email,
+ - log in.
      """, },
     "ukrainian_name": {"title": "Ласкаво просимо в Company observer",
                        "instruction": """
-     Ця програма створена для надання оперативного доступу до:
+Ця програма створена для надання оперативного доступу до:
 
-     - поточний стан справ у компанії
-     - архів інформації компанії
+ - стану оборотних коштів на обрану дату
+ - актуальним цінам на сировину, товари та готову продукцію
+ - обсягів виробництва
+ - стану складських запасів
+ - руху грошових коштів
+ - стану дебіторської та кредиторської заборгованостей
+ - балансу за кожним контрагентом
+ - архіву інформації компанії
 
-     На даний момент реалізовано:
-      - Авторизація
-      - Перегляд даних про складські запаси по днях та в динаміці
-      - перегляд даних про закупівлю та реалізацію сировини, товарів та готової продукції
-      - Перегляд балансів по кожному контрагенту
-      - звіти про дебіторську та кредиторську заборгованості
+ Для початку використання та з метою безпеки потрібно переконатися,
+ що Ви авторизований користувач.
 
-     Ведеться робота зі створення модулів:
-       - автоматичного розрахунку виробництва,
-       - Розрахунок собівартості,
-       - Руху коштів,
-       - Звітів про прибуток
-
-     Для початку використання та з метою безпеки потрібно переконатися
-      що Ви авторизований користувач,
-     - тому для початку пройдіть реєстрацію,
-     - підтвердіть свою електронну пошту,
-     - увійдіть до системи.
+ Як побачити більше?
+ - для початку пройдіть реєстрацію,
+ - підтвердіть свою електронну пошту,
+ - увійдіть до системи.
      """, },
     "russian_name": {"title": "Добро пожаловать в Company observer",
                      "instruction": """ 
     Это приложение создано для предоставления оперативного доступа к:
+    
+    - состоянию оборотных средств на выбранную дату
+    - актуальным ценам на сырье, товары и готовую продукцию
+    - объемам производства   
+    - состоянию складских запасов
+    - движению денежных средств
+    - состоянию дебиторской и кредиторской задолженностей
+    - балансу по каждому контрагенту
+    - архиву информации компании      
 
-    - текущему состоянию дел в компании
-    - архиву информации компании
-
-    В настоящий момент реализовано:
-     - авторизация 
-     - просмотр данных о складских запасах по дням и в динамике
-     - просмотр данных о закупке и реализации сырья, товаров и готовой продукции
-     - просмотр балансов по каждому контрагенту
-     - отчеты о дебиторской и кредиторской задолженностях
-
-    Ведется работа по созданию модулей:
-      - автоматического расчета производства,
-      - расчета себестоимости,
-      - движения денежных средств,
-      - отчетов о прибыли
-
-    Для начала использования и в целях безопасности нужно убедиться
-     что Вы авторизованый пользователь, 
-    - поэтому для начала пройдите регистрацию, 
+    Для начала использования и в целях безопасности нужно убедиться,
+     что Вы авторизованный пользователь.
+     
+     Как увидеть больше?
+    - для начала пройдите регистрацию, 
     - подтвердите свою электронную почту,
     - войдите в систему.
     """, },
@@ -146,27 +131,22 @@ hello_messages = {
                      "instruction": """
      Bu uygulama aşağıdakilere hızlı erişim sağlamak için oluşturuldu:
 
-     - şirketteki mevcut durum
-     - şirket bilgilerinin arşivi
+ - seçilen tarihte işletme sermayesinin durumu
+ - Hammadde, mal ve nihai ürünlerin güncel fiyatları
+ - üretim hacimleri
+ - stok durumu
+ - nakit akımı
+ - alacak hesaplarının ve borç hesaplarının durumu
+ - her karşı taraf için bakiye
+ - şirket bilgilerinin arşivi
 
-     Şu anda uygulanıyor:
-      - yetkilendirme
-      - Depo stoklarına ilişkin verilerin gün ve zamana göre görüntülenmesi
-      - Hammadde, mal ve bitmiş ürünlerin alım ve satımına ilişkin verilerin görüntülenmesi
-      - her karşı taraf için bakiyeleri görüntüleyin
-      - Alacaklar ve borçlar hakkında raporlar
+ Kullanmaya başlamak için ve güvenlik nedenlerinden dolayı aşağıdakileri yaptığınızdan emin olmanız gerekir:
+ yetkili kullanıcı olduğunuzu.
 
-     Modüller oluşturmak için çalışmalar sürüyor:
-       - otomatik üretim hesaplaması,
-       - maliyet hesabı,
-       - nakit akışları,
-       - kar raporları
-
-     Kullanmaya başlamak için ve güvenlik nedeniyle şunları yaptığınızdan emin olmanız gerekir:
-      yetkili kullanıcı olduğunuzu,
-     - yani ilk önce kayıt olun,
-     - e-postanızı onaylayın,
-     - giriş yapmak.
+ Daha fazlasını nasıl görebilirim?
+ - ilk önce kayıt olun
+ - e-postanızı onaylayın,
+ - giriş yapmak.
      """, },
 }
 

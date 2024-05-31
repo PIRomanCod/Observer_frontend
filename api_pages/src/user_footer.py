@@ -63,8 +63,8 @@ def footer():
 
     def _footer():
         myargs = [
-            "Made in 2023",
-            ",  by  PiRoman.", "      Принимаются предложения по усовершенствованию и доработке приложения"
+            "Made by  PiRoman, 2023-2024.    ",
+            "                           Принимаются предложения по усовершенствованию и доработке приложения"
         # image('https://avatars3.githubusercontent.com/u/45109972?s=400&v=4',
         #       width=px(25), height=px(25)),
         # " with ❤️ by ",

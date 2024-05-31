@@ -103,6 +103,10 @@ async def run_deals_app():
     # language = menu_id
     language = st.session_state.get("selected_language", "english_name")
 
+    user_level = st.session_state["role"]
+    if user_level == "admin":
+        st.title("!!!You can edit data!!!")
+
     st.sidebar.title(deals_messages[language]["title"])
     page = st.sidebar.selectbox(deals_messages[language]["Choose action"],
                                 [deals_messages[language]["Monthly report"],

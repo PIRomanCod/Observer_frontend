@@ -70,6 +70,10 @@ async def run_balances_app():
     # language = menu_id
     language = st.session_state.get("selected_language", "english_name")
 
+    user_level = st.session_state["role"]
+    if user_level == "admin":
+        st.title("!!!You can edit data!!!")
+
     st.sidebar.title(balance_messages[language]["title"])
     page = st.sidebar.selectbox(balance_messages[language]["Choose action"],
                                 [balance_messages[language]["Balance per period"],

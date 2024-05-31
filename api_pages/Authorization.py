@@ -50,10 +50,10 @@ class AuthenticationApp:
         # Add a sidebar to the page
         sidebar = st.sidebar
         sidebar.title("Actions")
-        action = sidebar.radio("Choose an action", ["Login", "Register", "Logout"])
+        action = sidebar.radio("Choose an action", ["Register", "LogIn", "LogOut"])
 
         # Handle the login action
-        if action == "Login":
+        if action == "LogIn":
             # Add a form for user login
             if self.access_token:
                 st.write("You are already In")
@@ -117,7 +117,7 @@ class AuthenticationApp:
 
 
         # Handle the logout action
-        elif action == "Logout":
+        elif action == "LogOut":
             # Delete the access token and refresh token from the object
             self.access_token = None
             self.refresh_token = None
@@ -135,6 +135,7 @@ class AuthenticationApp:
             # Display the user's information
             if user:
                 st.session_state["username"] = user['username']
+                st.session_state["role"] = user['roles']
                 st.write(f"Welcome, {user['username']}!")
 
                 # Refresh the access token every 25 minutes

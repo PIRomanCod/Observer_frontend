@@ -27,6 +27,10 @@ async def run_production_app():
         access_token = st.session_state.get("access_token", "")
         language = st.session_state.get("selected_language", "english_name")
 
+        user_level = st.session_state["role"]
+        if user_level == "admin":
+            st.title("!!!You can edit data!!!")
+
         with st.sidebar:
             selected_products = st.multiselect(stock_messages[language]["goods"], get_product_data(language, access_token),
                                                key="Products")

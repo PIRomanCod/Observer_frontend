@@ -273,6 +273,7 @@ def profile_page(acc_token):
         if user_info:
             st.write(f"Username: {user_info['username']}")
             st.write(f"Email: {user_info['email']}")
+            st.write(f"Allowed role: {user_info['roles']}")
             st.image(f"{user_info['avatar']}")
             st.session_state["username"] = user_info['username']
         else:
