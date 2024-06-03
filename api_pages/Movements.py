@@ -51,8 +51,8 @@ async def run_movements_app():
                 await get_chart(language, result)
                 st.write(movements_messages[language]["Details"])
                 st.write(result)
-            except TypeError:
-                st.write("ReLogin")
+            except TypeError as error:
+                st.write("ReLogin", error)
 
     elif page == movements_messages[language]["All for period"]:
         with st.sidebar:
@@ -74,8 +74,8 @@ async def run_movements_app():
         try:
             result = await get_movements_by_bank(language, access_token, params)
             await get_sankey_chart(language, result, access_token, threshold, show_self)
-        except KeyError:
-            st.write(stock_messages[language]["empty data"])
+        except KeyError as error:
+            st.write(stock_messages[language]["empty data"], error)
 
     elif page == movements_messages[language]["Movements by bank"]:
         with st.sidebar:
@@ -109,8 +109,8 @@ async def run_movements_app():
         try:
             result = await get_movements_by_bank(language, access_token, params)
             await get_sankey_chart(language, result, access_token, threshold, show_self)
-        except KeyError:
-            st.write(stock_messages[language]["empty data"])
+        except KeyError as error:
+            st.write(stock_messages[language]["empty data"], error)
 
 
 if __name__ == '__main__':

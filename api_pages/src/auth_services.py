@@ -213,12 +213,12 @@ config = configparser.ConfigParser()
 config.read("config.ini")
 
 # for web config
-FILE_NAME = config.get("DEV", "token_name")
-SERVER_URL = config.get("DEV", "APP_URL")
+# FILE_NAME = config.get("DEV", "token_name")
+# SERVER_URL = config.get("DEV", "APP_URL")
 #
 # # for tests config
-# FILE_NAME = config.get("TEST", "TOKEN_NAME")
-# SERVER_URL = config.get("TEST", "APP_URL")
+FILE_NAME = config.get("TEST", "TOKEN_NAME")
+SERVER_URL = config.get("TEST", "APP_URL")
 
 
 def load_token(filename=FILE_NAME):

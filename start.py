@@ -55,7 +55,7 @@ def main():
     # back()
     # language = menu_id
     footer()
-
+    st.session_state["role"] = None
     if menu_id == "home":
         with st.sidebar:
             # Відображення кнопки вибору (radio button) або випадаючого списку (selectbox) зі значеннями

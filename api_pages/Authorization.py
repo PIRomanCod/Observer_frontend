@@ -50,7 +50,7 @@ class AuthenticationApp:
         # Add a sidebar to the page
         sidebar = st.sidebar
         sidebar.title("Actions")
-        action = sidebar.radio("Choose an action", ["Register", "LogIn", "LogOut"])
+        action = sidebar.radio("Choose an action", ["LogIn", "LogOut", "Register"])
 
         # Handle the login action
         if action == "LogIn":

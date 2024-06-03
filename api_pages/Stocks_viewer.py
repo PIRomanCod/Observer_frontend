@@ -85,7 +85,7 @@ async def do_dynamic(selected_products, language, access_token):
     parameters = get_query_params(language, selected_products, start_date, end_date)
     if st.sidebar.button("GO"):
         data_from_db = get_db_data(access_token, parameters)
-
+        # st.write(data_from_db)
         # a dedicated single loader
         with hc.HyLoader('Now doing loading, wait please', hc.Loaders.pulse_bars):
             time.sleep(1)

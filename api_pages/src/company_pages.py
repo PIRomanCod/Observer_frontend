@@ -8,15 +8,15 @@ import dotenv
 
 import requests
 # from pages.Authorization import auth_manager
-
+from api_pages.src.auth_services import FILE_NAME, SERVER_URL
 # dotenv.load_dotenv()
 
-
-config = configparser.ConfigParser()
-config.read("config.ini")
-
-FILE_NAME = config.get("DEV", "token_name")
-SERVER_URL = config.get("DEV", "APP_URL")
+#
+# config = configparser.ConfigParser()
+# config.read("config.ini")
+#
+# FILE_NAME = config.get("DEV", "token_name")
+# SERVER_URL = config.get("DEV", "APP_URL")
 
 
 # def get_company_by_id(id):
@@ -34,7 +34,58 @@ def get_company_by_id(acc_token, id):
         data = response.json()
         return data
     else:
-        # auth_manager.refresh_token_in_background()
-        # get_company_by_id(acc_token, id)
-        # return f"Запит завершився з помилкою {response.status_code}: {response.text} Please login, time is done"
+        return {response.status_code: response.text}
+
+
+async def create_company_api(acc_token, company_data):
+    api_url = SERVER_URL + '/api/company/'
+    headers = {
+        "Authorization": f"Bearer {acc_token}",
+        'Content-Type': 'application/json'
+    }
+    response = requests.post(api_url, json=company_data, headers=headers)
+    if response.status_code == 201:
+        data = response.json()
+        return data
+    else:
+        return {response.status_code: response.text}
+
+async def update_company_api(acc_token, company_id, company_data):
+    api_url = SERVER_URL + f'/api/company/{company_id}'
+    headers = {
+        "Authorization": f"Bearer {acc_token}",
+        'Content-Type': 'application/json'
+    }
+    response = requests.put(api_url, json=company_data, headers=headers)
+    if response.status_code == 201:
+        data = response.json()
+        return data
+    else:
+        return {response.status_code: response.text}
+
+async def delete_company_api(acc_token, company_id):
+    api_url = SERVER_URL + f'/api/company/{company_id}'
+    headers = {
+        "Authorization": f"Bearer {acc_token}",
+        'Content-Type': 'application/json'
+    }
+    response = requests.delete(api_url, headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        return data
+    else:
+        return {response.status_code: response.text}
+
+async def search_companies_by_name(acc_token, company_name):
+    api_url = SERVER_URL + '/api/company/search/'
+    headers = {
+        "Authorization": f"Bearer {acc_token}",
+        'Content-Type': 'application/json'
+    }
+    params = {"company_name": company_name}
+    response = requests.get(api_url, headers=headers, params=params)
+    if response.status_code == 200:
+        data = response.json()
+        return data["items"]
+    else:
         return {response.status_code: response.text}

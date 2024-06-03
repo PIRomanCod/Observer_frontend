@@ -10,11 +10,11 @@ import requests
 
 # dotenv.load_dotenv()
 
-config = configparser.ConfigParser()
-config.read("config.ini")
-
-FILE_NAME = config.get("DEV", "token_name")
-from api_pages.src.auth_services import SERVER_URL
+# config = configparser.ConfigParser()
+# config.read("config.ini")
+#
+# FILE_NAME = config.get("DEV", "token_name")
+from api_pages.src.auth_services import SERVER_URL, FILE_NAME
 from api_pages.src.get_stocks_data import get_product_data
 from api_pages.src.company_pages import get_company_by_id
 
