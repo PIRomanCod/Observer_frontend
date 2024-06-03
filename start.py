@@ -46,7 +46,7 @@ menu_id = hc.nav_bar(
 
 # Отримання значення з st.session_state або встановлення значення за замовчуванням
 selected_language = st.session_state.get("selected_language", "english_name")
-
+st.session_state["role"] = None
 auth_manager = None
 
 
@@ -55,7 +55,6 @@ def main():
     # back()
     # language = menu_id
     footer()
-    st.session_state["role"] = None
     if menu_id == "home":
         with st.sidebar:
             # Відображення кнопки вибору (radio button) або випадаючого списку (selectbox) зі значеннями
