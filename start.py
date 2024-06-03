@@ -46,7 +46,11 @@ menu_id = hc.nav_bar(
 
 # Отримання значення з st.session_state або встановлення значення за замовчуванням
 selected_language = st.session_state.get("selected_language", "english_name")
-st.session_state["role"] = None
+
+if "role" not in st.session_state:
+    st.session_state["role"] = None
+user_level = st.session_state["role"]
+
 auth_manager = None
 
 
@@ -54,6 +58,7 @@ def main():
     st.sidebar.image("static/pro-logo.png", width=150)
     # back()
     # language = menu_id
+    # user_level = st.session_state["role"]
     footer()
     if menu_id == "home":
         with st.sidebar:
