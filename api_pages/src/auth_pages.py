@@ -276,6 +276,8 @@ def profile_page(acc_token):
             st.write(f"Allowed role: {user_info['roles']}")
             st.image(f"{user_info['avatar']}")
             st.session_state["username"] = user_info['username']
+            st.session_state["user"] = user_info
+            st.write(st.session_state["user"])
         else:
             st.error("Unable connect")
     except TypeError:

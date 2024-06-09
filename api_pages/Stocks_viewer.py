@@ -10,42 +10,13 @@ import plotly.express as px
 import streamlit as st
 # from pages.src.auth_services import FILE_NAME
 from api_pages.src.get_stocks_data import (post_stocks_data, get_product_data, del_stocks_by_date,
-                                           create_new_stock_note, upload_file_to_server)
+                                           create_new_stock_note, upload_file_to_server, create_product,
+                                           delete_product, update_product)
 from api_pages.src.user_footer import footer
 from api_pages.src.messages import stock_messages as messages, seeded_id, languages_id
 from api_pages.src.general_services import get_query_params, get_db_data
 
-#
-# st.set_page_config(page_title="Stocks",
-#                    page_icon=":articulated_lorry:")
 
-#
-# cookie_manager = stx.CookieManager()
-# cookies = cookie_manager.get_all()
-
-
-#
-# menu_data = [
-#     {'id': 'english_name', 'label': "english", 'icon': ":flag-gb:"},
-#     {'id': 'ukrainian_name', 'label': "українська"},
-#     {'id': 'russian_name', 'label': "русский"},
-#     {'id': 'turkish_name', 'label': "türkçe", 'icon': ":flag-tr:"},
-# ]
-#
-# menu_id = hc.nav_bar(
-#     menu_definition=menu_data,
-#     first_select=0,
-#     key="stock_nav",
-#     home_name=None,
-#     login_name={'id': "login_name", 'label': st.session_state.get("username", None), 'icon': "fa fa-user-circle", 'ttip': "username"},
-#     override_theme={'txc_inactive': 'white', 'menu_background': 'green', 'txc_active': 'yellow',
-#                     'option_active': 'blue'},
-#     sticky_nav=True,
-#     force_value=None,
-#     use_animation=True,
-#     hide_streamlit_markers=True,
-#     sticky_mode=None,
-#     option_menu=True)
 async def add_stocks(access_token, language):
     with st.expander("Add new stock report", expanded=False):
         data = {}
@@ -66,6 +37,7 @@ async def del_stocks(access_token, language):
         if st.button("GO", key="del_stock go"):
             del_stocks_by_date(data, access_token)
 
+
 async def upload_csv_file(access_token):
     with st.expander("Upload CSV file to load stocks", expanded=False):
         uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
@@ -74,6 +46,53 @@ async def upload_csv_file(access_token):
             if st.button("Upload"):
                 response = upload_file_to_server(uploaded_file, access_token)
                 st.write(response)
+
+async def products_list(language, access_token):
+    with st.expander("Get product list", expanded=False):
+        if st.button("GO", key="get_stocks list"):
+            response = get_product_data(language, access_token)
+            st.write(response)
+
+async def create_new_product(access_token):
+    with st.expander("New product", expanded=False):
+            payload = {}
+            payload["product_id"] = st.text_input(label="product_id", key="new_product_id")
+            payload["english_name"] = st.text_input(label="english_name", key="english_name")
+            payload["ukrainian_name"] = st.text_input(label="ukrainian_name", key="ukrainian_name")
+            payload["russian_name"] = st.text_input(label="russian_name", key="russian_name")
+            payload["turkish_name"] = st.text_input(label="turkish_name", key="turkish_name")
+            payload["user_id"] = 1
+            if st.button("GO", key="create new product"):
+                response = create_product(payload, access_token)
+                st.write(response)
+
+async def update_product_ui(acc_token):
+    with st.expander("Update product", expanded=False):
+        product_id = st.text_input("Product ID", key="Update Product_id")
+        english_name = st.text_input("english_name", key="Update Product english_name")
+        ukrainian_name = st.text_input("ukrainian_name", key="Update Product ukrainian_name")
+        russian_name = st.text_input("russian_name", key="Update Product russian_name")
+        turkish_name = st.text_input("turkish_name", key="Update Product turkish_name")
+
+        if st.button("Update Product"):
+            product_data = {
+                "english_name": english_name,
+                "ukrainian_name": ukrainian_name,
+                "russian_name": russian_name,
+                "turkish_name": turkish_name,
+                "user_id": 1
+            }
+            result = update_product(product_id, product_data, acc_token)
+            st.write(result)
+
+
+async def delete_product_ui(acc_token):
+    with st.expander("Delete Product", expanded=False):
+        product_id = st.text_input("Product ID to delete", key="ID to delete")
+
+        if st.button("Delete Product"):
+            result = delete_product(product_id, acc_token)
+            st.write(result)
 
 async def do_dynamic(selected_products, language, access_token):
     with st.sidebar:
@@ -204,6 +223,10 @@ async def main(access_token, language):
             await add_stocks(access_token, language)
             await del_stocks(access_token, language)
             await upload_csv_file(access_token)
+            await products_list(language, access_token)
+            await create_new_product(access_token)
+            await update_product_ui(access_token)
+            await delete_product_ui(access_token)
 
     except TypeError as err:
         st.write("ReLogin", err)

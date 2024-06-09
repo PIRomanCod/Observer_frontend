@@ -1,3 +1,5 @@
+from datetime import date, datetime
+
 import streamlit as st
 import json
 import os
@@ -19,7 +21,7 @@ from api_pages.src.get_stocks_data import get_product_data
 from api_pages.src.company_pages import get_company_by_id
 
 
-def get_deal_by_id(acc_token, id):
+async def get_deal_by_id(acc_token, id):
     api_url = SERVER_URL + f'/api/purchase/{id}'
     headers = {
         "Authorization": f"Bearer {acc_token}",
@@ -39,8 +41,7 @@ def get_deal_by_id(acc_token, id):
     else:
         return f"Запит завершився з помилкою {response.status_code}: {response.text} Please login, time is done"
 
-
-def get_deals_by_product(acc_token, product_id):
+async def get_deals_by_product(acc_token, product_id):
     api_url = SERVER_URL + '/api/purchase/by_product'
     headers = {
         "Authorization": f"Bearer {acc_token}",
@@ -54,8 +55,7 @@ def get_deals_by_product(acc_token, product_id):
     else:
         return f"Запит завершився з помилкою {response.status_code}: {response.text} Please login, time is done"
 
-
-def get_deals_by_company(acc_token, company_id):
+async def get_deals_by_company(acc_token, company_id):
     api_url = SERVER_URL + '/api/purchase/by_company'
     headers = {
         "Authorization": f"Bearer {acc_token}",
@@ -69,8 +69,7 @@ def get_deals_by_company(acc_token, company_id):
     else:
         return f"Запит завершився з помилкою {response.status_code}: {response.text} Please login, time is done"
 
-
-def get_deals_by_period(acc_token, start_date, end_date):
+async def get_deals_by_period(acc_token, start_date, end_date):
     api_url = SERVER_URL + '/api/purchase/by_period'
     headers = {
         "Authorization": f"Bearer {acc_token}",
@@ -89,7 +88,72 @@ def get_deals_by_period(acc_token, start_date, end_date):
     else:
         return f"Запит завершився з помилкою {response.status_code}: {response.text} Please login, time is done"
 
-
-def get_company_list(access_token):
+async def get_company_list(access_token):
     company_id = st.text_input("Enter id")
     return get_company_by_id(access_token, company_id)
+
+async def create_purchase(purchase_data, acc_token):
+    api_url = SERVER_URL + '/api/purchase/'
+    headers = {
+        "Authorization": f"Bearer {acc_token}",
+        'Content-Type': 'application/json'
+    }
+    response = requests.post(api_url, json=purchase_data, headers=headers)
+    if response.status_code == 201:
+        return response.json()
+    else:
+        return f"Запит завершився з помилкою {response.status_code}: {response.text}"
+
+
+async def update_purchase(purchase_id, purchase_data, acc_token):
+    api_url = f'{SERVER_URL}/api/purchase/{purchase_id}'
+    headers = {
+        "Authorization": f"Bearer {acc_token}",
+        'Content-Type': 'application/json'
+    }
+    response = requests.put(api_url, data=json.dumps(purchase_data), headers=headers)
+    if response.status_code == 201:
+        return response.json()
+    else:
+        return f"Запит завершився з помилкою {response.status_code}: {response.text}"
+
+async def delete_purchase(purchase_id, acc_token):
+    api_url = SERVER_URL + f'/api/purchase/{purchase_id}'
+    headers = {
+        "Authorization": f"Bearer {acc_token}",
+        'Content-Type': 'application/json'
+    }
+    response = requests.delete(api_url, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return f"Запит завершився з помилкою {response.status_code}: {response.text}"
+
+async def get_purchase_by_id(purchase_id, acc_token):
+    api_url = SERVER_URL + f'/api/purchase/{purchase_id}'
+    headers = {
+        "Authorization": f"Bearer {acc_token}",
+        'Content-Type': 'application/json'
+    }
+    response = requests.get(api_url, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return f"Запит завершився з помилкою {response.status_code}: {response.text}"
+
+async def upload_csv(file, acc_token):
+    api_url = f'{SERVER_URL}/api/purchase/upload-csv/'
+    headers = {"Authorization": f"Bearer {acc_token}"}
+    files = {'file': file}
+    response = requests.post(api_url, headers=headers, files=files)
+    return response
+
+async def delete_purchases(params, acc_token):
+    headers = {"Authorization": f"Bearer {acc_token}"}
+    response = requests.delete(SERVER_URL + "/api/purchase/purchases/", params=params, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return f"Запит завершився з помилкою {response.status_code}: {response.text}"
+
+

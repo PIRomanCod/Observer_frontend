@@ -89,3 +89,10 @@ async def search_companies_by_name(acc_token, company_name):
         return data["items"]
     else:
         return {response.status_code: response.text}
+
+async def upload_company_csv(file, acc_token):
+    api_url = f'{SERVER_URL}/api/company/upload-csv/'
+    headers = {"Authorization": f"Bearer {acc_token}"}
+    files = {'file': file}
+    response = requests.post(api_url, headers=headers, files=files)
+    return response

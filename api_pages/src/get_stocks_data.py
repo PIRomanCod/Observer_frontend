@@ -25,8 +25,7 @@ def post_stocks_data(params, acc_token):
         data = response.json()
         return data
     else:
-        return f"Запит завершився з помилкою {response.status_code}: {response.text} Please login, time is gone"
-
+        return f"Запит завершився з помилкою {response.status_code}: {response.text}"
 
 def get_product_data(language, acc_token):
 
@@ -42,8 +41,7 @@ def get_product_data(language, acc_token):
         data = response.json()
         return data
     else:
-        return f"Запит завершився з помилкою {response.status_code}: {response.text} Please login, time is gone"
-
+        return f"Запит завершився з помилкою {response.status_code}: {response.text}"
 
 def del_stocks_by_date(target_date, acc_token):
     api_url = SERVER_URL + f'/api/stocks/date/{target_date.strftime("%Y-%m-%d")}'
@@ -57,27 +55,26 @@ def del_stocks_by_date(target_date, acc_token):
         data = response.json()
         return data
     else:
-        return f"Запит завершився з помилкою {response.status_code}: {response.text} Please login, time is gone"
+        return f"Запит завершився з помилкою {response.status_code}: {response.text}"
 
 def create_new_stock_note(data, acc_token):
 
     api_url = SERVER_URL + '/api/stocks/'
     payload = {
-        "date": data["date"].strftime('%Y-%m-%d'),  # Перетворіть дату у строку
+        "date": data["date"].strftime('%Y-%m-%d'),
         "product_id": data["product_id"],
         "quantity": data["quantity"]
-    }    # data_json = json.dumps(data)
+    }
     headers = {
         "Authorization": f"Bearer {acc_token}",
         'Content-Type': 'application/json'
     }
     response = requests.post(api_url, json=payload, headers=headers)
     if response.status_code == 200:
-        # Отримати дані у форматі JSON
         data = response.json()
         return data
     else:
-        return f"Запит завершився з помилкою {response.status_code}: {response.text} Please login, time is gone"
+        return f"Запит завершився з помилкою {response.status_code}: {response.text}"
 
 def upload_file_to_server(uploaded_file, acc_token):
     api_url = f"{SERVER_URL}/api/stocks/upload_csv"
@@ -94,4 +91,47 @@ def upload_file_to_server(uploaded_file, acc_token):
     else:
         "Failed to upload and process file"
         return response.json()
+
+def create_product(payload, acc_token):
+
+    api_url = SERVER_URL + '/api/products/'
+    payload = payload   # data_json = json.dumps(data)
+
+    headers = {
+        "Authorization": f"Bearer {acc_token}",
+        'Content-Type': 'application/json'
+    }
+    response = requests.post(api_url, json=payload, headers=headers)
+    if response.status_code == 201:
+        data = response.json()
+        return data
+    else:
+        return f"Запит завершився з помилкою {response.status_code}: {response.text}"
+
+# Функція для оновлення продукту
+def update_product(product_id, product_data, acc_token):
+    api_url = SERVER_URL + f'/api/products/{product_id}'
+    headers = {
+        "Authorization": f"Bearer {acc_token}",
+        'Content-Type': 'application/json'
+    }
+    response = requests.put(api_url, json=product_data, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return f"Запит завершився з помилкою {response.status_code}: {response.text}"
+
+# Функція для видалення продукту
+def delete_product(product_id, acc_token):
+    api_url = SERVER_URL + f'/api/products/{product_id}'
+    headers = {
+        "Authorization": f"Bearer {acc_token}",
+        'Content-Type': 'application/json'
+    }
+    response = requests.delete(api_url, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return f"Запит завершився з помилкою {response.status_code}: {response.text}"
+
 

@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import time
 import asyncio
 
@@ -14,9 +14,12 @@ import streamlit as st
 import hydralit_components as hc
 
 from api_pages.src.company_pages import (get_company_by_id, create_company_api, update_company_api,
-                                         delete_company_api, search_companies_by_name)
+                                         delete_company_api, search_companies_by_name, upload_company_csv)
 from api_pages.src.goods_pages import get_goods_by_id
-from api_pages.src.deals_pages import get_deal_by_id, get_deals_by_product, get_deals_by_company, get_deals_by_period
+from api_pages.src.deals_pages import (get_deal_by_id, get_deals_by_product, get_deals_by_company, get_deals_by_period,
+                                       create_purchase, update_purchase, delete_purchase, get_purchase_by_id,
+                                       upload_csv, delete_purchases)
+
 from api_pages.src.auth_services import load_token, save_tokens, FILE_NAME
 from api_pages.src.user_footer import footer
 from api_pages.src.messages import deals_messages
@@ -124,12 +127,30 @@ async def get_company(access_token):
         else:
             st.write("Error: ", result)
 
+async def upload_company_csv_ui(acc_token):
+    with st.expander("Upload company from CSV File", expanded=False):
+        uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+        if uploaded_file is not None:
+            if st.button("Upload"):
+                progress_bar = st.progress(0)
+                status_text = st.empty()
+                for percent_complete in range(100):
+                    time.sleep(0)  # Штучна затримка для симуляції завантаження
+                    progress_bar.progress(percent_complete + 1)
+                    status_text.text(f"Uploading... {percent_complete + 1}%")
+                # Код для завантаження CSV файлу і отримання відповіді від сервера
+                response = await upload_company_csv(uploaded_file, acc_token)
+                status_text.text("Upload complete!")
+                st.write(response.json())
+
+
+
 async def company_crud(access_token):
     await get_company(access_token)
     await create_company(access_token)
     await update_company(access_token)
     await delete_company(access_token)
-
+    await upload_company_csv_ui(access_token)
 
 async def do_deals_report(language, access_token):
     with st.sidebar:
@@ -149,20 +170,20 @@ async def do_deals_report(language, access_token):
         with hc.HyLoader('Now doing loading, wait please', hc.Loaders.pulse_bars):
             time.sleep(1)
         try:
-            result = get_deals_by_period(access_token, start_date, end_date)
+            result = await get_deals_by_period(access_token, start_date, end_date)
             if len(result["items"]) > 1:
                 # Побудова таблиці
                 df = pd.DataFrame(result["items"])
 
                 # Вибір лише деяких стовбців та зміна порядку
                 selected_columns = ["date", "product_id", "company_id", "quantity", "sum_total_tl", "sum_total_usd",
-                                    "operation_type", "cost_per_mt_tl", "cost_per_mt_usd"]
+                                    "operation_type", "cost_per_mt_tl", "cost_per_mt_usd", "id"]
                 df_selected = df[selected_columns]
 
                 # Зміна порядку стовбців
                 df_selected = df_selected[
                     ["date", "operation_type", "company_id", "product_id", "quantity", "sum_total_tl", "sum_total_usd",
-                     "cost_per_mt_tl", "cost_per_mt_usd"]]
+                     "cost_per_mt_tl", "cost_per_mt_usd", "id"]]
 
                 # Розділення даних за типом операції
                 df_income = df_selected[df_selected["operation_type"] == "income"]
@@ -187,17 +208,17 @@ async def do_deals_report(language, access_token):
                 # Вибір лише деяких стовбців та зміна порядку
                 selected_columns_2 = ["date", "product_name", "company_name", "quantity", "sum_total_tl",
                                       "sum_total_usd",
-                                      "cost_per_mt_usd"]
+                                      "cost_per_mt_usd", "id"]
                 df_income = df_income[selected_columns_2]
                 df_outcome = df_outcome[selected_columns_2]
 
                 # Зміна порядку стовбців
                 df_income = df_income[
                     ["date", "company_name", "product_name", "quantity", "sum_total_tl", "sum_total_usd",
-                     "cost_per_mt_usd"]]
+                     "cost_per_mt_usd", "id"]]
                 df_outcome = df_outcome[
                     ["date", "company_name", "product_name", "quantity", "sum_total_tl", "sum_total_usd",
-                     "cost_per_mt_usd"]]
+                     "cost_per_mt_usd", "id"]]
 
                 # Додати новий стовбець для середньозваженої ціни
 
@@ -264,16 +285,130 @@ async def do_deals_report(language, access_token):
         except TypeError as error:
             st.write("Please LogIn to continue", error)
 
+async def create_purchase_ui(acc_token):
+    with st.expander("Create Purchase", expanded=False):
+
+        purchase_data = {
+            "date": st.date_input("Date", key="new_date"),
+            "operation_type": st.selectbox("Operation Type", ["income", "outcome"], key="new_operation_type"),
+            "quantity": st.number_input("Quantity", min_value=0.0, key="new_quantity"),
+            "company_id": st.number_input("Company ID", min_value=1, step=1, key="new_company_id"),
+            "product_id": st.number_input("Product ID", min_value=1, step=1, key="new_product_id"),
+            "price_tl": st.number_input("Price TL", min_value=0.0, key="new_v"),
+            "transfer_cost": st.number_input("Transfer Cost", min_value=0.0, value=0.0, key="new_transfer_cost"),
+            "commission_duties": st.number_input("Commission Duties", min_value=0.0, value=0.0, key="commission_duties"),
+            "sum_total_tl": st.number_input("Sum Total TL", min_value=0.0, key="new_sum_total_tl"),
+            "appr_ex_rate": st.number_input("Approx. Exchange Rate", min_value=0.0, key="new_appr_ex_rate"),
+            "sum_total_usd": st.number_input("Sum Total USD", min_value=0.0, key="new_sum_total_usd"),
+            "account_type": st.text_input("Account Type", key="new_account_type"),
+            "cost_per_mt_tl": st.number_input("Cost per MT TL", min_value=0.0, key="new_cost_per_mt_tl"),
+            "cost_per_mt_usd": st.number_input("Cost per MT USD", min_value=0.0, key="new_cost_per_mt_usd"),
+            "user_id": st.number_input("User ID", min_value=1, step=1, key="new_user_id")
+        }
+
+        if st.button("Create Purchase"):
+            purchase_data["date"] = purchase_data["date"].isoformat()
+            result = await create_purchase(purchase_data, acc_token)
+            st.write(result)
+
+async def update_purchase_ui(acc_token):
+    with st.expander("Update Purchase", expanded=False):
+        purchase_id = st.number_input("Purchase ID", min_value=1, step=1)
+
+        if st.button("Fetch Purchase Data"):
+            purchase_data = await get_purchase_by_id(purchase_id, acc_token)
+            if isinstance(purchase_data, dict):
+                st.session_state["purchase_data"] = purchase_data
+            else:
+                st.write(purchase_data)
+
+        if "purchase_data" in st.session_state:
+            purchase_data = st.session_state["purchase_data"]
+
+            purchase_data["date"] = st.date_input("Date", value=datetime.strptime(purchase_data["date"],
+             '%Y-%m-%d').date() if isinstance(purchase_data["date"], str) else purchase_data["date"])
+            purchase_data["operation_type"] = st.selectbox("Operation Type", ["income", "outcome"],
+                                                           index=["income", "outcome"].index(
+                                                               purchase_data["operation_type"]))
+            purchase_data["quantity"] = st.number_input("Quantity", value=purchase_data["quantity"])
+            purchase_data["company_id"] = st.number_input("Company ID", value=purchase_data["company_id"])
+            purchase_data["product_id"] = st.number_input("Product ID", value=purchase_data["product_id"])
+            purchase_data["price_tl"] = st.number_input("Price TL", value=purchase_data["price_tl"])
+            purchase_data["transfer_cost"] = st.number_input("Transfer Cost",
+                                                             value=purchase_data["transfer_cost"] or 0.0)
+            purchase_data["commission_duties"] = st.number_input("Commission Duties",
+                                                                 value=purchase_data["commission_duties"] or 0.0)
+            purchase_data["sum_total_tl"] = st.number_input("Sum Total TL", value=purchase_data["sum_total_tl"])
+            purchase_data["appr_ex_rate"] = st.number_input("Approx. Exchange Rate",
+                                                            value=purchase_data["appr_ex_rate"])
+            purchase_data["sum_total_usd"] = st.number_input("Sum Total USD", value=purchase_data["sum_total_usd"])
+            purchase_data["account_type"] = st.text_input("Account Type", value=purchase_data["account_type"])
+            purchase_data["cost_per_mt_tl"] = st.number_input("Cost per MT TL", value=purchase_data["cost_per_mt_tl"])
+            purchase_data["cost_per_mt_usd"] = st.number_input("Cost per MT USD",
+                                                               value=purchase_data["cost_per_mt_usd"])
+            # purchase_data["user_id"] = int(st.session_state["user"]["id"])
+
+            if st.button("Update Purchase"):
+                # Перетворення дати у строку
+                if isinstance(purchase_data["date"], date):
+                    purchase_data["date"] = purchase_data["date"].isoformat()
+                result = await update_purchase(purchase_id, purchase_data, acc_token)
+                st.write(result)
+
+async def delete_purchase_ui(acc_token):
+    with st.expander("Delete Purchase", expanded=False):
+        purchase_id = st.number_input("Purchase ID to delete", min_value=1, step=1)
+        if st.button("Delete Purchase"):
+            result = await delete_purchase(purchase_id, acc_token)
+            st.write(result)
+
+async def upload_csv_ui(acc_token):
+    with st.expander("Upload CSV File", expanded=False):
+        uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+        if uploaded_file is not None:
+            if st.button("Upload"):
+                progress_bar = st.progress(0)
+                status_text = st.empty()
+                for percent_complete in range(100):
+                    time.sleep(0.1)  # Штучна затримка для симуляції завантаження
+                    progress_bar.progress(percent_complete + 1)
+                    status_text.text(f"Uploading... {percent_complete + 1}%")
+                # Код для завантаження CSV файлу і отримання відповіді від сервера
+                response = await upload_csv(uploaded_file, acc_token)
+                status_text.text("Upload complete!")
+                st.write(response.json())
+
+async def delete_purchases_ui(acc_token):
+    with st.expander("Delete Purchases for period", expanded=False):
+        start_date = st.date_input("Start Date", value=date.today())
+        end_date = st.date_input("End Date", value=date.today())
+        if st.button("Delete Purchases"):
+            if start_date > end_date:
+                st.error("Start date cannot be after end date")
+            else:
+                params = {
+                    'start_date': start_date.isoformat(),
+                    'end_date': end_date.isoformat()
+                }
+                result = await delete_purchases(params, acc_token)
+                if isinstance(result, dict):
+                    st.success(result.get("detail"))
+                    st.write(f"Deleted purchases: {result.get('deleted_count')}")
+                else:
+                    st.error(result)
+
+async def purchase_crud(access_token):
+    await create_purchase_ui(access_token)
+    await update_purchase_ui(access_token)
+    await delete_purchase_ui(access_token)
+    await upload_csv_ui(access_token)
+    await delete_purchases_ui(access_token)
 
 async def run_deals_app():
     footer()
     access_token = None
     access_token = st.session_state.get("access_token", "")
     language = st.session_state.get("selected_language", "english_name")
-
-    user_level = st.session_state["role"]
-    if user_level == "admin":
-        st.write("!!!You can edit the data!!!")
 
     st.sidebar.title(deals_messages[language]["title"])
     page = st.sidebar.selectbox(deals_messages[language]["Choose action"],
@@ -286,6 +421,11 @@ async def run_deals_app():
 
     elif page == deals_messages[language]["Monthly report"]:
         await do_deals_report(language, access_token)
+
+        user_level = st.session_state["role"]
+        if user_level == "admin":
+            st.write("!!!You can edit the data!!!")
+            await purchase_crud(access_token)
 
 
 if __name__ == '__main__':
