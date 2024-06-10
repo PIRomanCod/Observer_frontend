@@ -167,9 +167,9 @@ async def get_sankey_chart(language, df, acc_token, threshold, show_self):
     st.write(movements_messages[language]["Details"])
     st.write(df)
 
-    df["sender"] = df.apply(lambda row: "pro oi̇l yağ" if row["operation_type"] == "debit" else row["company_id"],
+    df["sender"] = df.apply(lambda row: "pro oil yag" if row["operation_type"] == "debit" else row["company_id"],
                                 axis=1)
-    df["reciever"] = df.apply(lambda row: row["company_id"] if row["operation_type"] == "debit" else "pro oi̇l yağ",
+    df["reciever"] = df.apply(lambda row: row["company_id"] if row["operation_type"] == "debit" else "pro oil yag",
                                axis=1)
 
     # Групування ланок за відправником та отримувачем
@@ -177,7 +177,7 @@ async def get_sankey_chart(language, df, acc_token, threshold, show_self):
 
     # # Видалення рядків, де обидві колонки "відправник" та "отримувач" одночасно мають значення "My_company"
     if not show_self:
-        grouped_df = grouped_df[~((grouped_df["sender"] == "pro oi̇l yağ") & (grouped_df["reciever"] == "pro oi̇l yağ"))]
+        grouped_df = grouped_df[~((grouped_df["sender"] == "pro oil yag") & (grouped_df["reciever"] == "pro oil yag"))]
 
     # Визначення порогів для кожної валюти
     thresholds = {'usd': 100, 'eur': 100, 'tl': threshold}  # Задайте пороги за потребою
