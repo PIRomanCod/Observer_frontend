@@ -40,10 +40,7 @@ async def get_movements_by_multifilter(language, acc_token):
     # Опциональные параметры запроса, если есть
     params = {
         "offset": 0,
-        "limit": 5000#,
-        #"currency": "usd"
-        # ,
-        # "payment_way": 16
+        "limit": 5000
     }
 
     response = requests.get(url, headers=headers, params=params)
@@ -102,8 +99,8 @@ async def get_movements_by_multifilter(language, acc_token):
 
 
 async def get_chart(language, frame):
-    frame = frame[frame['name'] != 'Vakif vinov']
-    frame = frame[frame['name'] != 'QNB deposit']
+    # frame = frame[frame['name'] != 'Vakif vinov']
+    # frame = frame[frame['name'] != 'QNB deposit']
 
     # Сортуємо датафрейм за полем 'balance' у зростаючому порядку
     frame = frame.sort_values(by='balance')
@@ -124,10 +121,9 @@ async def get_chart(language, frame):
 
     st.plotly_chart(fig2)
 
-
 async def get_total(language, frame):
-    frame = frame[frame['name'] != 'Vakif vinov']
-    frame = frame[frame['name'] != 'QNB deposit']
+    # frame = frame[frame['name'] != 'Vakif vinov']
+    # frame = frame[frame['name'] != 'QNB deposit']
 
     # Сортуємо датафрейм за полем 'balance' у зростаючому порядку
     frame = frame.sort_values(by='balance')
@@ -159,38 +155,44 @@ async def get_movements_by_bank(language, acc_token, params):
 
 async def get_sankey_chart(language, df, acc_token, threshold, show_self):
     companies_mapping = await get_companies(acc_token)
-    # st.write(companies_mapping)
-
     # Заміна значень в колонці company_id на відповідні значення з company_name
     df['company_id'] = df['company_id'].map(companies_mapping)
+
+    if df.empty:
+        st.write("No data available to display the chart.")
+        return
 
     st.write(movements_messages[language]["Details"])
     st.write(df)
 
     df["sender"] = df.apply(lambda row: "pro oil yag" if row["operation_type"] == "debit" else row["company_id"],
-                                axis=1)
+                            axis=1)
     df["reciever"] = df.apply(lambda row: row["company_id"] if row["operation_type"] == "debit" else "pro oil yag",
-                               axis=1)
+                              axis=1)
 
     # Групування ланок за відправником та отримувачем
     grouped_df = df.groupby(['sender', 'reciever', 'currency']).agg({'sum': 'sum'}).reset_index()
 
-    # # Видалення рядків, де обидві колонки "відправник" та "отримувач" одночасно мають значення "My_company"
+    # Видалення рядків, де обидві колонки "відправник" та "отримувач" одночасно мають значення "My_company"
     if not show_self:
         grouped_df = grouped_df[~((grouped_df["sender"] == "pro oil yag") & (grouped_df["reciever"] == "pro oil yag"))]
 
     # Визначення порогів для кожної валюти
     thresholds = {'usd': 100, 'eur': 100, 'tl': threshold}  # Задайте пороги за потребою
 
-    # Об'єднання ланок, які мають суму менше порогу для кожної валюти
     for currency, threshold in thresholds.items():
         filtered_df = grouped_df[grouped_df["currency"] == currency]
+
+        if filtered_df.empty:
+            st.write(f"No data available for {currency} currency.")
+            continue
 
         # Видалення записів, які не відповідають порогу
         filtered_df = filtered_df[filtered_df['sum'] >= threshold]
 
-        # filtered_df.loc[filtered_df['sum'] < threshold, 'sender'] = 'Other'
-        # filtered_df = filtered_df.groupby(['sender', 'reciever', 'currency']).agg({'sum': 'sum'}).reset_index()
+        if filtered_df.empty:
+            st.write(f"No data above threshold for {currency} currency.")
+            continue
 
         # Створення вузлів та зв'язків
         nodes = pd.concat([filtered_df["sender"], filtered_df["reciever"]]).unique()
@@ -217,8 +219,6 @@ async def get_sankey_chart(language, df, acc_token, threshold, show_self):
                 source=[link["source"] for link in links],
                 target=[link["target"] for link in links],
                 value=[link["value"] for link in links],
-                # color=['rgba(0, 0, 255, 0.6)' if link["source"] == 'Other' or link[
-                #     "target"] == 'Other' else 'rgba(0, 255, 0, 0.6)' for link in links]
             )
         )])
 
@@ -233,3 +233,80 @@ async def get_sankey_chart(language, df, acc_token, threshold, show_self):
             height=600
         )
         st.plotly_chart(fig)
+
+async def upload_csv(file, acc_token):
+    api_url = f'{SERVER_URL}/api/movements/upload-csv/'
+    headers = {"Authorization": f"Bearer {acc_token}"}
+    files = {'file': file}
+    response = requests.post(api_url, headers=headers, files=files)
+    return response
+
+async def get_movements_by_period(start_date, end_date, acc_token):
+    url = SERVER_URL + "/api/movements/by_period"
+    headers = {"Authorization": f"Bearer {acc_token}"}
+
+    # Перетворення дат в рядковий формат YYYY-MM-DD
+    start_date_str = start_date.strftime("%Y-%m-%d")
+    end_date_str = end_date.strftime("%Y-%m-%d")
+
+    params = {'start_date': start_date_str, 'end_date': end_date_str}
+    response = requests.post(url, headers=headers, params=params)
+
+    if response.status_code == 200:
+        data = response.json()
+        full_list = data["items"]
+        df = pd.DataFrame(full_list)
+        return df
+    else:
+        return {response.status_code: response.text}
+
+
+async def get_movement_by_id(movement_id, acc_token):
+    url = f"{SERVER_URL}/api/movements/{movement_id}"
+    headers = {"Authorization": f"Bearer {acc_token}"}
+
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        st.error(f"Error fetching movement: {response.status_code}")
+        return None
+
+
+async def update_movement(movement_id, movement_data, acc_token):
+    url = f"{SERVER_URL}/api/movements/{movement_id}"
+    headers = {"Authorization": f"Bearer {acc_token}", "Content-Type": "application/json"}
+
+    response = requests.put(url, headers=headers, json=movement_data)
+    if response.status_code == 201:
+        st.success("Movement updated successfully!")
+        return response.json()
+    else:
+        st.error(f"Error updating movement: {response.status_code}")
+        return None
+
+
+async def create_movement(movement_data, acc_token):
+    url = f"{SERVER_URL}/api/movements/"
+    headers = {"Authorization": f"Bearer {acc_token}", "Content-Type": "application/json"}
+
+    response = requests.post(url, headers=headers, json=movement_data)
+    if response.status_code == 201:
+        st.success("Movement created successfully!")
+        return response.json()
+    else:
+        st.error(f"Error creating movement: {response.status_code}")
+        return None
+
+
+async def delete_movement(movement_id, acc_token):
+    url = f"{SERVER_URL}/api/movements/{movement_id}"
+    headers = {"Authorization": f"Bearer {acc_token}"}
+
+    response = requests.delete(url, headers=headers)
+    if response.status_code == 200:
+        st.success("Movement deleted successfully!")
+        return response.json()
+    else:
+        st.error(f"Error deleting movement: {response.status_code}")
+        return None

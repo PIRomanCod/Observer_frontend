@@ -86,7 +86,7 @@ async def get_deals_by_period(acc_token, start_date, end_date):
     if response.status_code == 200:
         return response.json()
     else:
-        return f"Запит завершився з помилкою {response.status_code}: {response.text} Please login, time is done"
+        return f"Запит завершився з помилкою {response.status_code}: {response.text}"
 
 async def get_company_list(access_token):
     company_id = st.text_input("Enter id")
