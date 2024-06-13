@@ -1,3 +1,4 @@
+import json
 from decimal import Decimal
 
 import pandas as pd
@@ -5,6 +6,7 @@ import streamlit as st
 import configparser
 import matplotlib.pyplot as plt
 import seaborn as sns
+import io
 
 import plotly.express as px
 import plotly.subplots as sp
@@ -86,7 +88,6 @@ async def get_turnovers(language, acc_token):
     else:
         return f"{balance_messages[language]['error_response']} {response.status_code}: {response.text}"
 
-
 async def get_rate_by_date(language, acc_token, date):
     date_str = date.strftime("%Y-%m-%d")
     api_url = SERVER_URL + f'/api/rates/{date_str}'
@@ -95,9 +96,6 @@ async def get_rate_by_date(language, acc_token, date):
         'Content-Type': 'application/json'
     }
 
-    # Перетворення дат в рядковий формат YYYY-MM-DD
-
-    # params = {'date': date_str}
     response = requests.get(api_url, headers=headers)#, params=params)
 
     if response.status_code == 200:
@@ -105,6 +103,37 @@ async def get_rate_by_date(language, acc_token, date):
     else:
         return f"{balance_messages[language]['error_response']} {response.status_code}: {response.text}"
 
+async def create_exch_rate_api(access_token, rate_data):
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = requests.post(f"{SERVER_URL}/api/rates/", json=rate_data, headers=headers)
+
+    if response.status_code == 201:
+        return "Exchange rate created successfully"
+    else:
+        return f"Failed to create exchange rate: {response.text}"
+
+async def delete_exch_rate_api(access_token, date):
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = requests.delete(f"{SERVER_URL}/api/rates/{date.strftime('%Y-%m-%d')}", headers=headers)
+
+    if response.status_code == 200:
+        return "Exchange rate deleted successfully"
+    else:
+        return f"Failed to delete exchange rate: {response.text}"
+
+async def upload_csv_api(access_token, uploaded_file):
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    # Використовуємо io.BytesIO для створення файлоподібного об'єкта
+    file_obj = io.BytesIO(uploaded_file.getvalue())
+    files = {"file": (uploaded_file.name, file_obj, "text/csv")}
+
+    response = requests.post(f"{SERVER_URL}/api/rates/upload-csv/", headers=headers, files=files)
+
+    if response.status_code == 200:
+        return "CSV file uploaded successfully"
+    else:
+        return f"Failed to upload CSV file: {response.text}"
 
 async def calculate_balance(data):
     tl_balance = 0
@@ -131,32 +160,6 @@ async def calculate_balance(data):
     eval_to_usd = usd_balance+tl_balance/usd_tl_rate
 
     return round(eval_to_tl, 2), round(eval_to_usd, 2)
-
-#
-# async def calculate_balance_usd(language, data):
-#     usd_balance = 0
-#
-#     for item in data.get("items", []):
-#         print(item)
-#         sum_value = Decimal(item.get("sum", 0))
-#         currency = item.get("currency", "").lower()
-#
-#         # Convert to TL if currency is USD or EUR
-#         if currency in ["tl", "eur"]:
-#             usd_tl_rate = Decimal(item.get("usd_tl_rate", 1))
-#             eur_usd_rate = Decimal(item.get("eur_usd_rate", 1))
-#             if currency == "tl":
-#                 sum_value = sum_value/usd_tl_rate
-#             elif currency == "eur":
-#                 sum_value = sum_value * eur_usd_rate
-#
-#         if item.get("operation_type", "").lower() == "debit":
-#             usd_balance += sum_value
-#         elif item.get("operation_type", "").lower() == "credit":
-#             usd_balance -= sum_value
-#         print(usd_balance)
-#     return round(usd_balance, 2)
-
 
 async def get_tables(exchange_rate, data):
     df = pd.DataFrame(data["items"])
@@ -249,7 +252,6 @@ async def get_tables(exchange_rate, data):
 
     return grouped_df, grouped_df1
 
-
 async def get_plot_by_category(language, data):
     st.title(balance_messages[language]["turn_category"])
     st.write(balance_messages[language]["graph"])
@@ -299,7 +301,6 @@ async def get_plot_by_category(language, data):
     columns_to_drop = ['debit_turnover_target_usd', 'credit_turnover_target_usd']
     st.write(balance_messages[language]["turnovers"])
     st.write(data.drop(columns=columns_to_drop))
-
 
 async def get_plot_by_companies(language, data):
     st.title(balance_messages[language]["turn_company"])
@@ -356,7 +357,6 @@ async def get_plot_by_companies(language, data):
     columns_to_drop = ['debit_turnover_target_usd', 'credit_turnover_target_usd', 'company_name']
     st.write(balance_messages[language]["turnovers"])
     st.write(data.drop(columns=columns_to_drop))
-
 
 async def get_debit_credit_tables(exchange_rate, data):
     df = pd.DataFrame(data["items"])
@@ -479,7 +479,6 @@ async def get_debit_credit_tables(exchange_rate, data):
 
     return grouped_positive_category_balances, grouped_negative_category_balances, grouped_positive_company_balances, grouped_negative_company_balances
 
-
 async def get_plot_by_separated_category(language, data):
     st.title(balance_messages[language]["category"])
     st.write(balance_messages[language]["graph"])
@@ -534,7 +533,6 @@ async def get_plot_by_separated_category(language, data):
     columns_to_drop = ['debit_turnover_usd', 'credit_turnover_usd', 'debit_turnover_tl', 'credit_turnover_tl', 'balance_usd_abs', 'balance_tl_abs']
     st.write(balance_messages[language]["category_balance"])
     st.write(data_for_graph0.drop(columns=columns_to_drop))
-
 
 async def get_plot_by_separated_companies(language, data):
     st.title(balance_messages[language]["by_company"])
@@ -593,4 +591,42 @@ async def get_plot_by_separated_companies(language, data):
     st.write(balance_messages[language]["Balance per company"])
     st.write(data_for_graph.drop(columns=columns_to_drop))
 
+async def create_transaction_api(access_token, transaction_data):
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = requests.post(f"{SERVER_URL}/api/transactions/", json=transaction_data, headers=headers)
+    if response.status_code == 201:
+        return "Transaction created successfully"
+    else:
+        return f"Failed to create transaction: {response.text}"
 
+async def delete_transaction_api(access_token, transaction_id):
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = requests.delete(f"{SERVER_URL}/api/transactions/{transaction_id}", headers=headers)
+    if response.status_code == 200:
+        return "Transaction deleted successfully"
+    else:
+        return f"Failed to delete transaction: {response.text}"
+
+async def get_transaction_by_id_for_update(transaction_id, access_token):
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = requests.get(f"{SERVER_URL}/api/transactions/{transaction_id}", headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return f"Failed to fetch transaction: {response.text}"
+
+async def update_transaction_api(transaction_id, transaction_data, access_token):
+    headers = {"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"}
+    response = requests.put(f"{SERVER_URL}/api/transactions/{transaction_id}", data=json.dumps(transaction_data), headers=headers)
+    if response.status_code == 201:
+        return response.json()
+    else:
+        return f"Failed to update transaction: {response.status_code} - {response.text}"
+
+async def upload_csv_transaction_api(access_token, file):
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = requests.post(f"{SERVER_URL}/api/transactions/upload-csv/", files={"file": file}, headers=headers)
+    if response.status_code == 200:
+        return f"CSV file uploaded successfully: {response.json()}"
+    else:
+        return f"Failed to upload CSV file: {response.text}"

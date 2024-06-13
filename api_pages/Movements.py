@@ -235,7 +235,7 @@ async def run_movements_app():
 
     user_level = st.session_state["role"]
     if user_level == "admin":
-        st.subheader("!!!You can edit data!!!")
+        st.write("!!!You can edit the data!!!")
         await movements_crud(access_token, language)
 
 

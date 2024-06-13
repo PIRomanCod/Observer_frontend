@@ -29,7 +29,7 @@ async def run_production_app():
 
         user_level = st.session_state["role"]
         if user_level == "admin":
-            st.title("!!!You can edit data!!!")
+            st.write("!!!You can edit the data!!!")
 
         with st.sidebar:
             selected_products = st.multiselect(stock_messages[language]["goods"], get_product_data(language, access_token),
@@ -73,7 +73,7 @@ async def run_production_app():
                 # st.write("Stocks data")
                 # st.write(stocks_data)
 
-            deals_data_from_db = get_deals_by_period(access_token, start_date, end_date) #end_date
+            deals_data_from_db = await get_deals_by_period(access_token, start_date, end_date) #end_date
             if len(deals_data_from_db["items"]) > 1:
                 deals_data = pd.DataFrame(deals_data_from_db["items"])
 
@@ -190,7 +190,7 @@ async def run_production_app():
 
 
     except TypeError as e:
-        st.write(f"Please LogIn to continue")# //n {e}")
+        st.write(f"Please LogIn to continue {e}")
 
 # st.write(st.session_state)
 
